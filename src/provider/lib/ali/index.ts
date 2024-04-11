@@ -92,6 +92,7 @@ export default class ProviderAli extends Provider {
       };
 
       item.status = "pending";
+      this._updateStatus();
       try {
         await originItem.rename(item.newFileName);
         if (originItem.name === item.newFileName) {

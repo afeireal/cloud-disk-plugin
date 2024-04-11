@@ -238,6 +238,7 @@ export abstract class Provider {
   private _matchedCount: number = 0;
   // 状态计数
   private _failStatusCount: number = 0;
+  private _readyStatusCount: number = 0;
   private _pendingStatusCount: number = 0;
   private _successStatusCount: number = 0;
   // 是否有错误
@@ -259,6 +260,7 @@ export abstract class Provider {
     let changeCount = 0;
     let matchedCount = 0;
     let failStatusCount = 0;
+    let readyStatusCount = 0;
     let pendingStatusCount = 0;
     let successStatusCount = 0;
 
@@ -270,12 +272,14 @@ export abstract class Provider {
         item.isChange && changeCount++;
         item.isMatched && matchedCount++;
       }
-      if (item.status === "success") {
+      if (item.status === "pending") {
+        pendingStatusCount++;
+      } else if (item.status === "success") {
         successStatusCount++;
+      } else if (item.status === "ready") {
+        readyStatusCount++;
       } else if (item.status === "fail") {
         failStatusCount++;
-      } else if (item.status === "pending") {
-        pendingStatusCount++;
       }
     });
     this._emptyCount = emptyCount;
@@ -284,6 +288,7 @@ export abstract class Provider {
     this._changeCount = changeCount;
     this._matchedCount = matchedCount;
     this._failStatusCount = failStatusCount;
+    this._readyStatusCount = readyStatusCount;
     this._pendingStatusCount = pendingStatusCount;
     this._successStatusCount = successStatusCount;
 
@@ -314,6 +319,12 @@ export abstract class Provider {
         if (this._pendingStatusCount) {
           result.push({
             message: `加载中(${this._pendingStatusCount})`,
+            className: "blue",
+          });
+        }
+        if (this._readyStatusCount) {
+          result.push({
+            message: `准备中(${this._readyStatusCount})`,
             className: "blue",
           });
         }

@@ -75,6 +75,7 @@ export default class ProviderQuark extends Provider {
       const item = taskList.shift() as IListItem;
 
       item.status = "pending";
+      this._updateStatus();
       try {
         const res = await reactFiberNode.pendingProps.rename({
           fid: item.id,
