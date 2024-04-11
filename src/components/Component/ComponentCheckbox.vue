@@ -10,11 +10,7 @@
     @change="onChange"
   >
     <span class="component-checkbox-input">
-      <input
-        class="component-checkbox-input-original"
-        type="checkbox"
-        :checked="modelValue"
-      />
+      <input class="component-checkbox-input-original" type="checkbox" :checked="modelValue" />
     </span>
     <span v-if="label || $slots.default" class="component-checkbox-label">
       <template v-if="!$slots.default && label">{{ label }}</template>
@@ -133,8 +129,7 @@ export default defineComponent({
 .component-checkbox.is-checked .component-checkbox-input::before {
   background-color: var(--cdp-component-checkbox-color);
 }
-.component-checkbox.is-checked:not(.is-indeterminate)
-  .component-checkbox-input::after {
+.component-checkbox.is-checked:not(.is-indeterminate) .component-checkbox-input::after {
   border-right-color: #fff;
   border-bottom-color: #fff;
 }

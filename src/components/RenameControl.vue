@@ -1,9 +1,7 @@
 <template>
   <div v-if="providerRef" class="rename-control">
     <div class="rename-control-header">
-      <span class="rename-control-header-content">
-        批量重命名当前目录下所有文件
-      </span>
+      <span class="rename-control-header-content"> 批量重命名当前目录下所有文件 </span>
       <a
         v-if="hasNewVersion"
         :href="updateHref"
@@ -18,10 +16,7 @@
         title="点击检查更新"
         @click="checkVersion"
       >
-        <component-icon
-          v-if="getRemoteVersionLoading"
-          name="loading"
-        ></component-icon>
+        <component-icon v-if="getRemoteVersionLoading" name="loading"></component-icon>
         当前版本：{{ localVersion }}
       </span>
     </div>
@@ -76,10 +71,7 @@
         >
           正则模式
         </component-radio>
-        <component-checkbox
-          v-model="providerRef.replaceParams.autoEpisode"
-          :disabled="isDisabled"
-        >
+        <component-checkbox v-model="providerRef.replaceParams.autoEpisode" :disabled="isDisabled">
           自动集数
         </component-checkbox>
       </div>
@@ -130,8 +122,7 @@ export default defineComponent({
     const providerRef = inject<Ref<Provider>>("providerRef");
 
     const isDisabled = computed(
-      () =>
-        providerRef?.value.replaceParamsDisabled || providerRef?.value.isLoading
+      () => providerRef?.value.replaceParamsDisabled || providerRef?.value.isLoading
     );
     const onResetClick = () => {
       providerRef?.value.reset();
@@ -155,11 +146,7 @@ export default defineComponent({
 <style scoped>
 .rename-control {
   padding: var(--cdp-gutter);
-  background: linear-gradient(
-    180deg,
-    var(--cdp-color-gray-50) 0%,
-    var(--cdp-color-gray-100) 100%
-  );
+  background: linear-gradient(180deg, var(--cdp-color-gray-50) 0%, var(--cdp-color-gray-100) 100%);
   box-shadow: var(--cdp-box-shadow-md);
   transition: box-shadow var(--cdp-transition-default);
   border-radius: var(--cdp-gutter);

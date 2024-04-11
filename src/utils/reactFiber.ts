@@ -39,10 +39,7 @@ export const findReactFiberNode = (
 export let rootReactContainer: IReactFiberNode;
 
 function _getRootReactContainer(selectors: string): IReactFiberNode | undefined;
-function _getRootReactContainer(
-  selectors: string,
-  isPromise?: boolean
-): Promise<IReactFiberNode>;
+function _getRootReactContainer(selectors: string, isPromise?: boolean): Promise<IReactFiberNode>;
 function _getRootReactContainer(
   selectors: string,
   isPromise: boolean = true
@@ -57,17 +54,13 @@ function _getRootReactContainer(
   }
   const keys = Object.keys(rootElement) as Array<keyof Element>;
 
-  const reactContainerKey = keys.find((item: keyof Element) =>
-    item.startsWith("__reactContainer")
-  );
+  const reactContainerKey = keys.find((item: keyof Element) => item.startsWith("__reactContainer"));
 
   if (!reactContainerKey) {
     return isPromise ? Promise.reject() : undefined;
   }
 
-  rootReactContainer = rootElement[
-    reactContainerKey
-  ] as unknown as IReactFiberNode;
+  rootReactContainer = rootElement[reactContainerKey] as unknown as IReactFiberNode;
 
   return isPromise ? Promise.resolve(rootReactContainer) : rootReactContainer;
 }

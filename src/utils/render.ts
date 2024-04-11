@@ -9,10 +9,7 @@ export interface IRenderOptions {
   children?: IRenderOptions | IRenderOptions[];
 }
 
-const render = (
-  option: IRenderOptions | IRenderOptions[],
-  props?: any
-): VNode | VNode[] => {
+const render = (option: IRenderOptions | IRenderOptions[], props?: any): VNode | VNode[] => {
   if (isArray(option)) {
     const result: VNode[] = [];
     option.forEach((item: IRenderOptions) => {

@@ -1,9 +1,6 @@
 <template>
   <div class="component-loading">
-    <component-icon
-      class="component-loading-icon"
-      name="loading"
-    ></component-icon>
+    <component-icon class="component-loading-icon" name="loading"></component-icon>
   </div>
 </template>
 

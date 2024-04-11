@@ -30,9 +30,7 @@
           <div class="rename-preview-grid-item-checkbox">
             <component-checkbox
               :model-value="providerRef.hasCheckedAll"
-              :indeterminate="
-                !providerRef.hasCheckedAll && !providerRef.hasUncheckedAll
-              "
+              :indeterminate="!providerRef.hasCheckedAll && !providerRef.hasUncheckedAll"
               @update:model-value="onCheckedAllUpdate"
             ></component-checkbox>
           </div>
@@ -72,17 +70,11 @@
               @update:model-value="onItemIsCheckedUpdate(item, $event)"
             ></component-checkbox>
           </div>
-          <div
-            class="rename-preview-grid-item-old-file-name"
-            :title="item.oldFileName"
-          >
+          <div class="rename-preview-grid-item-old-file-name" :title="item.oldFileName">
             {{ item.oldFileName }}
           </div>
           <div class="rename-preview-grid-item-right-arrow">⮕</div>
-          <div
-            class="rename-preview-grid-item-new-file-name"
-            :title="item.newFileName"
-          >
+          <div class="rename-preview-grid-item-new-file-name" :title="item.newFileName">
             {{ item.newFileName }}
           </div>
           <div class="rename-preview-grid-item-new-file-status">

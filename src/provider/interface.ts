@@ -33,10 +33,7 @@ export abstract class Provider {
   public setVisible(val: boolean = false) {
     if (
       !val &&
-      (this.isLoading ||
-        this.isUpdateLoading ||
-        this.isControlLoading ||
-        this.isPreviewLoading)
+      (this.isLoading || this.isUpdateLoading || this.isControlLoading || this.isPreviewLoading)
     ) {
       return false;
     }
@@ -121,8 +118,7 @@ export abstract class Provider {
           const fileName = this.replaceParams.title || item.fileName;
           let newFileName = fileName + season;
           if (this.replaceParams.autoEpisode) {
-            const episode =
-              (season ? "" : ".") + "E" + complementZero(index + 1);
+            const episode = (season ? "" : ".") + "E" + complementZero(index + 1);
             newFileName += episode;
           }
           newFileName += "." + item.ext;
@@ -150,8 +146,7 @@ export abstract class Provider {
                   regexp as RegExp,
                   this.replaceParams.replace
                 );
-                newFileName +=
-                  (newFileName ? ".E" : "E") + complementZero(index + 1);
+                newFileName += (newFileName ? ".E" : "E") + complementZero(index + 1);
                 if (newFileName) {
                   newFileName += "." + item.ext;
                 }
@@ -181,30 +176,21 @@ export abstract class Provider {
   private _listItemGeneralMethod(item: IListItem, newFileNameSet: Set<string>) {
     item.isChange = item.oldFileName !== item.newFileName;
     item.isEmpty = item.isChecked && !item.newFileName;
-    item.isRepeat =
-      item.isChecked &&
-      !!item.newFileName &&
-      newFileNameSet.has(item.newFileName);
+    item.isRepeat = item.isChecked && !!item.newFileName && newFileNameSet.has(item.newFileName);
     item.isError = item.isEmpty || item.isRepeat;
     item.isChecked && newFileNameSet.add(item.newFileName);
   }
 
   // 文件列表更新回调函数集合
-  private _currentListUpdateHandlerSet: Set<
-    (currentList: IListItem[]) => void
-  > = new Set();
+  private _currentListUpdateHandlerSet: Set<(currentList: IListItem[]) => void> = new Set();
   // 绑定文件列表更新回调函数
-  public onCurrentListUpdate(
-    handler: (currentList: IListItem[]) => void
-  ): void {
+  public onCurrentListUpdate(handler: (currentList: IListItem[]) => void): void {
     if (!this._currentListUpdateHandlerSet.has(handler)) {
       this._currentListUpdateHandlerSet.add(handler);
     }
   }
   // 解绑文件列表更新回调函数
-  public offCurrentListUpdate(
-    handler: (currentList: IListItem[]) => void
-  ): void {
+  public offCurrentListUpdate(handler: (currentList: IListItem[]) => void): void {
     if (this._currentListUpdateHandlerSet.has(handler)) {
       this._currentListUpdateHandlerSet.delete(handler);
     }
@@ -307,8 +293,7 @@ export abstract class Provider {
     this.shouldContinue = !this.hasError && this.hasChange;
 
     this.hasCheckedAll = this._uncheckedList.size === 0;
-    this.hasUncheckedAll =
-      this._uncheckedList.size === this._currentList.length;
+    this.hasUncheckedAll = this._uncheckedList.size === this._currentList.length;
 
     this._updateStatusList();
   }
@@ -317,10 +302,7 @@ export abstract class Provider {
     const result: IStatusList[] = [];
     if (!this._currentList.length) {
       const title = "无文件";
-      result.push(
-        { icon: "closeCircleFilled", title, className: "red" },
-        { message: title }
-      );
+      result.push({ icon: "closeCircleFilled", title, className: "red" }, { message: title });
     } else {
       if (this.isUpdateLoading) {
         if (this._successStatusCount) {

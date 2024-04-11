@@ -16,9 +16,7 @@ function querySelector(
     return element;
   } else if (isBoolean(isPromise)) {
     if (isPromise) {
-      return element
-        ? Promise.resolve(element)
-        : Promise.reject(selectors + " is not found");
+      return element ? Promise.resolve(element) : Promise.reject(selectors + " is not found");
     }
     return element;
   } else if (element) {
@@ -38,7 +36,7 @@ function querySelector(
     });
   } else {
     return Promise.reject(selectors + " is not found");
-  };
+  }
 }
 
 export default querySelector;

@@ -10,7 +10,7 @@
 import type { Ref } from "vue";
 import type Provider from "@/provider/interface";
 
-import { inject, provide, computed, defineComponent } from "vue";
+import { inject, computed, defineComponent } from "vue";
 import RenamePanel from "@/components/RenamePanel.vue";
 
 export default defineComponent({
@@ -21,9 +21,7 @@ export default defineComponent({
   setup() {
     const providerRef = inject<Ref<Provider>>("providerRef");
 
-    const EnterComponent = computed(() =>
-      providerRef?.value?.EnterComponent?.()
-    );
+    const EnterComponent = computed(() => providerRef?.value?.EnterComponent?.());
 
     return {
       EnterComponent,

@@ -38,14 +38,7 @@
 </template>
 
 <script lang="ts">
-import {
-  ref,
-  watch,
-  computed,
-  nextTick,
-  onMounted,
-  defineComponent,
-} from "vue";
+import { ref, watch, computed, nextTick, onMounted, defineComponent } from "vue";
 import { isEmpty } from "@/utils/is";
 
 export default defineComponent({
@@ -86,14 +79,10 @@ export default defineComponent({
         }
       },
     });
-    const computedPlaceholder = computed(() =>
-      props.label ? "" : props.placeholder
-    );
+    const computedPlaceholder = computed(() => (props.label ? "" : props.placeholder));
 
     const isFocus = ref(false);
-    const isActive = computed(
-      () => !isEmpty(props.modelValue) || isFocus.value
-    );
+    const isActive = computed(() => !isEmpty(props.modelValue) || isFocus.value);
 
     const inputRef = ref<HTMLInputElement>();
     const textareaRef = ref<HTMLTextAreaElement>();
@@ -167,9 +156,7 @@ export default defineComponent({
   font-size: inherit;
   box-sizing: border-box;
   margin-top: var(--cdp-component-input-size);
-  padding-top: calc(
-    var(--cdp-component-input-size) + var(--cdp-component-label-size)
-  );
+  padding-top: calc(var(--cdp-component-input-size) + var(--cdp-component-label-size));
   margin-bottom: var(--cdp-component-input-size);
   border-bottom: 1px solid var(--cdp-color-gray);
   padding-bottom: var(--cdp-component-input-size);
@@ -206,9 +193,7 @@ export default defineComponent({
   color: var(--cdp-color-gray);
 }
 .component-input-label {
-  top: calc(
-    var(--cdp-component-label-size) + var(--cdp-component-input-size) * 1.5
-  );
+  top: calc(var(--cdp-component-label-size) + var(--cdp-component-input-size) * 1.5);
   left: calc(var(--cdp-component-input-size) * 2);
   color: var(--cdp-color-gray-700);
   position: absolute;

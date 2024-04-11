@@ -1,8 +1,4 @@
-import type {
-  IListItem,
-  IOriginListItem,
-  TRootElementInsertMethod,
-} from "@/provider/interface";
+import type { IListItem, IOriginListItem, TRootElementInsertMethod } from "@/provider/interface";
 
 import EnterComponent from "./EnterComponent.vue";
 import Provider from "@/provider/interface";
@@ -12,9 +8,7 @@ import fileNameParse from "@/utils/fileNameParse";
 
 export default class ProviderBaidu extends Provider {
   static test = () =>
-    /^https:\/\/pan\.baidu\.com\/disk\/main(.+)?#\/index\?category=all/.test(
-      location.href
-    );
+    /^https:\/\/pan\.baidu\.com\/disk\/main(.+)?#\/index\?category=all/.test(location.href);
 
   type = "baidu";
   rootElementId = "cloud-disk-plugin";

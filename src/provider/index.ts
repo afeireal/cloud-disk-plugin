@@ -9,11 +9,9 @@ export const getProvider = (): Provider | undefined => {
   if (ProviderAli.test()) {
     provider = provider instanceof ProviderAli ? provider : new ProviderAli();
   } else if (ProviderBaidu.test()) {
-    provider =
-      provider instanceof ProviderBaidu ? provider : new ProviderBaidu();
+    provider = provider instanceof ProviderBaidu ? provider : new ProviderBaidu();
   } else if (ProviderQuark.test()) {
-    provider =
-      provider instanceof ProviderQuark ? provider : new ProviderQuark();
+    provider = provider instanceof ProviderQuark ? provider : new ProviderQuark();
   } else {
     return undefined;
   }

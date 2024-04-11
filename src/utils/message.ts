@@ -43,13 +43,9 @@ interface IMessageFunctionSpecialOptions {
   position?: TMessageOptionsPosition;
 }
 
-type TMessageFunctionOptions = IMessageComponentOptions &
-  IMessageFunctionSpecialOptions;
+type TMessageFunctionOptions = IMessageComponentOptions & IMessageFunctionSpecialOptions;
 
-type TMessageTypeFunctionOptions = Omit<
-  TMessageFunctionOptions,
-  "type" | "message"
->;
+type TMessageTypeFunctionOptions = Omit<TMessageFunctionOptions, "type" | "message">;
 
 type TDefaultMessageFunctionOptions = TMessageFunctionOptions &
   Required<Pick<TMessageFunctionOptions, "position">>;
@@ -62,10 +58,7 @@ interface IMessageInstance {
 }
 
 interface IMessageTypeFunction {
-  (
-    message: TMessageOptionsMessage,
-    options?: TMessageFunctionOptions
-  ): IMessageInstance;
+  (message: TMessageOptionsMessage, options?: TMessageFunctionOptions): IMessageInstance;
 }
 
 interface IMessage {
@@ -92,8 +85,7 @@ interface iPositionContainer {
   hasMask?: iPositionMaskContainer;
 }
 
-const containers: { [key in TMessageOptionsPosition]?: iPositionContainer } =
-  {};
+const containers: { [key in TMessageOptionsPosition]?: iPositionContainer } = {};
 
 const defaultOptions: TDefaultMessageFunctionOptions = {
   zIndex: 2000,
@@ -106,12 +98,7 @@ let seed = 0;
 
 const message: IMessage = (options: TMessageFunctionOptions) => {
   const id = "component-message-" + seed++;
-  const {
-    zIndex,
-    hasMask,
-    position,
-    ...props
-  }: TDefaultMessageFunctionOptions = {
+  const { zIndex, hasMask, position, ...props }: TDefaultMessageFunctionOptions = {
     ...defaultOptions,
     ...globalOptions,
     ...options,
@@ -141,9 +128,7 @@ const message: IMessage = (options: TMessageFunctionOptions) => {
     positionContainer[maskKey] = { el, count: 1 };
   }
 
-  const positionMaskContainer = positionContainer[
-    maskKey
-  ] as iPositionMaskContainer;
+  const positionMaskContainer = positionContainer[maskKey] as iPositionMaskContainer;
 
   if (hsaPositionMaskContainer) {
     positionMaskContainer.count++;
@@ -198,26 +183,16 @@ const message: IMessage = (options: TMessageFunctionOptions) => {
 
 const messageFunction = message;
 
-message.info = (
-  message: TMessageOptionsMessage,
-  options?: TMessageTypeFunctionOptions
-) => messageFunction({ ...options, type: MESSAGE_TYPE_INFO, message });
-message.error = (
-  message: TMessageOptionsMessage,
-  options?: TMessageTypeFunctionOptions
-) => messageFunction({ ...options, type: MESSAGE_TYPE_ERROR, message });
-message.success = (
-  message: TMessageOptionsMessage,
-  options?: TMessageTypeFunctionOptions
-) => messageFunction({ ...options, type: MESSAGE_TYPE_SUCCESS, message });
-message.warning = (
-  message: TMessageOptionsMessage,
-  options?: TMessageTypeFunctionOptions
-) => messageFunction({ ...options, type: MESSAGE_TYPE_WARNING, message });
-message.loading = (
-  message: TMessageOptionsMessage,
-  options?: TMessageTypeFunctionOptions
-) => messageFunction({ ...options, type: MESSAGE_TYPE_LOADING, message });
+message.info = (message: TMessageOptionsMessage, options?: TMessageTypeFunctionOptions) =>
+  messageFunction({ ...options, type: MESSAGE_TYPE_INFO, message });
+message.error = (message: TMessageOptionsMessage, options?: TMessageTypeFunctionOptions) =>
+  messageFunction({ ...options, type: MESSAGE_TYPE_ERROR, message });
+message.success = (message: TMessageOptionsMessage, options?: TMessageTypeFunctionOptions) =>
+  messageFunction({ ...options, type: MESSAGE_TYPE_SUCCESS, message });
+message.warning = (message: TMessageOptionsMessage, options?: TMessageTypeFunctionOptions) =>
+  messageFunction({ ...options, type: MESSAGE_TYPE_WARNING, message });
+message.loading = (message: TMessageOptionsMessage, options?: TMessageTypeFunctionOptions) =>
+  messageFunction({ ...options, type: MESSAGE_TYPE_LOADING, message });
 
 message.closeAll = () => {
   for (let i = instances.length - 1; i >= 0; i--) {

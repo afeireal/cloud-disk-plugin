@@ -1,8 +1,4 @@
-import type {
-  IListItem,
-  IOriginListItem,
-  TRootElementInsertMethod,
-} from "@/provider/interface";
+import type { IListItem, IOriginListItem, TRootElementInsertMethod } from "@/provider/interface";
 
 import EnterComponent from "./EnterComponent.vue";
 import Provider from "@/provider/interface";
@@ -10,8 +6,7 @@ import fileNameParse from "@/utils/fileNameParse";
 import { findReactFiberNode, getRootReactContainer } from "@/utils/reactFiber";
 
 export default class ProviderQuark extends Provider {
-  static test = () =>
-    /^https:\/\/pan.quark.cn\/list#\/list\//.test(location.href);
+  static test = () => /^https:\/\/pan.quark.cn\/list#\/list\//.test(location.href);
 
   type = "quark";
   rootElementId = "cloud-disk-plugin";
@@ -25,10 +20,7 @@ export default class ProviderQuark extends Provider {
   private _rootReactContainerSelectors = "#ice-container";
 
   async getOriginList() {
-    const rootReactContainer = await getRootReactContainer(
-      this._rootReactContainerSelectors,
-      true
-    );
+    const rootReactContainer = await getRootReactContainer(this._rootReactContainerSelectors, true);
 
     const reactFiberNode = findReactFiberNode(
       rootReactContainer,
@@ -61,10 +53,7 @@ export default class ProviderQuark extends Provider {
   }
 
   async renameRequest(data: IListItem[]) {
-    const rootReactContainer = await getRootReactContainer(
-      this._rootReactContainerSelectors,
-      true
-    );
+    const rootReactContainer = await getRootReactContainer(this._rootReactContainerSelectors, true);
 
     const reactFiberNode = findReactFiberNode(
       rootReactContainer,
@@ -106,10 +95,7 @@ export default class ProviderQuark extends Provider {
   }
 
   async refresh() {
-    const rootReactContainer = await getRootReactContainer(
-      this._rootReactContainerSelectors,
-      true
-    );
+    const rootReactContainer = await getRootReactContainer(this._rootReactContainerSelectors, true);
 
     const reactFiberNode = findReactFiberNode(
       rootReactContainer,

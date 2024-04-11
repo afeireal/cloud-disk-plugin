@@ -7,11 +7,9 @@ export const is = <T = any>(val: unknown, type: string): val is T =>
 
 // export const isDate = (val: unknown): val is Date => is<Date>(val, "Date");
 
-export const isArray = (val: unknown): val is Array<any> =>
-  is<Array<any>>(val, "Array");
+export const isArray = (val: unknown): val is Array<any> => is<Array<any>>(val, "Array");
 
-export const isString = (val: unknown): val is string =>
-  is<string>(val, "String");
+export const isString = (val: unknown): val is string => is<string>(val, "String");
 
 // export const isNumber = (val: unknown): val is number =>
 //   is<number>(val, "Number");
@@ -20,27 +18,21 @@ export const isString = (val: unknown): val is string =>
 
 // export const isRegExp = (val: unknown): val is RegExp => is<RegExp>(val, "RegExp");
 
-export const isObject = (val: any): val is Record<any, any> =>
-  is<Record<any, any>>(val, "Object");
+export const isObject = (val: any): val is Record<any, any> => is<Record<any, any>>(val, "Object");
 
-export const isBoolean = (val: unknown): val is boolean =>
-  is<boolean>(val, "Boolean");
+export const isBoolean = (val: unknown): val is boolean => is<boolean>(val, "Boolean");
 
 // export const isPromise = (val: unknown): val is Promise<any> => is<Promise<any>>(val, "Promise");
 
-export const isFunction = (val: unknown): val is Function =>
-  is<Function>(val, "Function");
+export const isFunction = (val: unknown): val is Function => is<Function>(val, "Function");
 
 export const isNull = (val: unknown): val is null => val === null;
 
-export const isUndefined = (val: unknown): val is undefined =>
-  val === undefined;
+export const isUndefined = (val: unknown): val is undefined => val === undefined;
 
-export const isVoid = (val: unknown): val is null | undefined =>
-  isNull(val) || isUndefined(val);
+export const isVoid = (val: unknown): val is null | undefined => isNull(val) || isUndefined(val);
 
-export const isEmpty = (val: unknown): val is null | undefined | "" =>
-  isVoid(val) || val === "";
+export const isEmpty = (val: unknown): val is null | undefined | "" => isVoid(val) || val === "";
 
 // export const isEmptyValue = (val: unknown): boolean => {
 //   if (isArray(val) || isString(val)) {

@@ -1,8 +1,6 @@
 const regexp = /^((.|\n)+)\.([^.]+)$/;
 
-export const fileNameParse = (
-  payload: string
-): { ext: string; fileName: string } => {
+export const fileNameParse = (payload: string): { ext: string; fileName: string } => {
   const matchResult = payload.match(regexp);
   return {
     ext: matchResult?.[3] || "",

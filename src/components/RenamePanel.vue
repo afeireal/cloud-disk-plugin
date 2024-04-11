@@ -2,11 +2,7 @@
   <teleport to="body">
     <div v-if="providerRef" class="rename-panel">
       <transition name="fade">
-        <div
-          v-if="providerRef.visible"
-          class="rename-panel-mask"
-          @click="onMaskClick"
-        ></div>
+        <div v-if="providerRef.visible" class="rename-panel-mask" @click="onMaskClick"></div>
       </transition>
       <transition name="fade-bottom">
         <div v-if="providerRef.visible" class="rename-panel-container">

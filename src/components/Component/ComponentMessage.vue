@@ -19,16 +19,10 @@
           :name="computedIcon"
           class="component-message-content-icon"
         ></component-icon>
-        <div
-          v-if="computedMessageType === 'message'"
-          class="component-message-content-message"
-        >
+        <div v-if="computedMessageType === 'message'" class="component-message-content-message">
           {{ message }}
         </div>
-        <div
-          v-else-if="computedMessageType === 'vnode'"
-          class="component-message-content-message"
-        >
+        <div v-else-if="computedMessageType === 'vnode'" class="component-message-content-message">
           <component :is="message"></component>
         </div>
         <div
@@ -36,10 +30,7 @@
           v-html="message"
           class="component-message-content-message"
         ></div>
-        <div
-          v-else-if="computedMessageType === 'slot'"
-          class="component-message-content-message"
-        >
+        <div v-else-if="computedMessageType === 'slot'" class="component-message-content-message">
           <slot></slot>
         </div>
         <component-icon
@@ -79,9 +70,7 @@ export default defineComponent({
     type: {
       type: String,
       validator(value: string) {
-        return ["info", "success", "warning", "error", "loading"].includes(
-          value
-        );
+        return ["info", "success", "warning", "error", "loading"].includes(value);
       },
     },
     icon: {

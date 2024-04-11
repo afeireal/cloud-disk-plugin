@@ -1,8 +1,4 @@
-import type {
-  IListItem,
-  IOriginListItem,
-  TRootElementInsertMethod,
-} from "@/provider/interface";
+import type { IListItem, IOriginListItem, TRootElementInsertMethod } from "@/provider/interface";
 
 import EnterComponent from "./EnterComponent.vue";
 import Provider from "@/provider/interface";
@@ -12,9 +8,7 @@ import { findReactFiberNode, getRootReactContainer } from "@/utils/reactFiber";
 
 export default class ProviderAli extends Provider {
   static test = () =>
-    /^https:\/\/www\.ali(pan|yundrive)\.com\/drive\/file\/(backup|resource)/.test(
-      location.href
-    );
+    /^https:\/\/www\.ali(pan|yundrive)\.com\/drive\/file\/(backup|resource)/.test(location.href);
 
   type = "ali";
   rootElementId = "cloud-disk-plugin";
@@ -26,10 +20,7 @@ export default class ProviderAli extends Provider {
   private _rootReactContainerSelectors = "#root";
 
   async getOriginList() {
-    const rootReactContainer = await getRootReactContainer(
-      this._rootReactContainerSelectors,
-      true
-    );
+    const rootReactContainer = await getRootReactContainer(this._rootReactContainerSelectors, true);
 
     const reactFiberNode = findReactFiberNode(
       rootReactContainer,
@@ -40,8 +31,7 @@ export default class ProviderAli extends Provider {
       return Promise.reject();
     }
 
-    const listModel =
-      reactFiberNode.pendingProps.localStore.listModel.listModel;
+    const listModel = reactFiberNode.pendingProps.localStore.listModel.listModel;
 
     while (listModel.nextMarker) {
       await listModel.loadMoreData();
@@ -68,10 +58,7 @@ export default class ProviderAli extends Provider {
   }
 
   async renameRequest(data: IListItem[]) {
-    const rootReactContainer = await getRootReactContainer(
-      this._rootReactContainerSelectors,
-      true
-    );
+    const rootReactContainer = await getRootReactContainer(this._rootReactContainerSelectors, true);
 
     const reactFiberNode = findReactFiberNode(
       rootReactContainer,
@@ -83,10 +70,7 @@ export default class ProviderAli extends Provider {
     }
 
     const originListMap = new Map(
-      reactFiberNode.pendingProps.localStore.list.map((item: any) => [
-        item.fileId,
-        item,
-      ])
+      reactFiberNode.pendingProps.localStore.list.map((item: any) => [item.fileId, item])
     );
 
     const taskList: { item: IListItem; originItem: any }[] = [];
@@ -125,10 +109,7 @@ export default class ProviderAli extends Provider {
   }
 
   async refresh() {
-    const rootReactContainer = await getRootReactContainer(
-      this._rootReactContainerSelectors,
-      true
-    );
+    const rootReactContainer = await getRootReactContainer(this._rootReactContainerSelectors, true);
 
     const reactFiberNode = findReactFiberNode(
       rootReactContainer,

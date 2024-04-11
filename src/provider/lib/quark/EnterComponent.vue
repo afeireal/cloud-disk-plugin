@@ -35,11 +35,7 @@ export default defineComponent({
 </script>
 
 <style>
-#ice-container
-  .section-main
-  > .section-header.list-header
-  > .btn-operate
-  > .btn-main {
+#ice-container .section-main > .section-header.list-header > .btn-operate > .btn-main {
   display: flex;
   align-items: center;
 }
