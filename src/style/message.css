@@ -1,0 +1,56 @@
+.component-message-area {
+  left: 0;
+  right: 0;
+  padding: 5px;
+  display: flex;
+  z-index: 20000;
+  position: fixed;
+  overflow: hidden;
+  flex-wrap: nowrap;
+  box-sizing: border-box;
+  transition: var(--cdp-transition-all);
+  pointer-events: none;
+  flex-direction: column;
+}
+.component-message-area.is-top-left,
+.component-message-area.is-top-center,
+.component-message-area.is-top-right {
+  top: 0;
+}
+.component-message-area.is-top-left {
+  align-items: flex-start;
+}
+.component-message-area.is-top-center {
+  align-items: center;
+}
+.component-message-area.is-top-right {
+  align-items: flex-end;
+}
+.component-message-area.is-center {
+  top: 0;
+  bottom: 0;
+  align-items: center;
+  justify-content: center;
+}
+.component-message-area.is-bottom-left,
+.component-message-area.is-bottom-center,
+.component-message-area.is-bottom-right {
+  bottom: 0;
+  justify-content: flex-end;
+}
+.component-message-area.is-bottom-left {
+  align-items: flex-start;
+}
+.component-message-area.is-bottom-center {
+  align-items: center;
+}
+.component-message-area.is-bottom-right {
+  align-items: flex-end;
+}
+.component-message-area.has-mask {
+  top: 0;
+  bottom: 0;
+  z-index: 99999;
+  pointer-events: all;
+  backdrop-filter: blur(calc(var(--cdp-gutter) / 2));
+}
