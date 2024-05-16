@@ -1,9 +1,19 @@
 {
   "name": "cloud-disk-plugin",
   "type": "module",
-  "author": "realafei",
   "version": "1.0.2",
-  "repository": "https://github.com/realafei/cloud-disk-plugin",
+  "author": "afeireal",
+  "keywords": [
+    "网盘",
+    "重命名",
+    "批量重命名",
+    "cloud disk",
+    "rename",
+    "batch rename",
+    "tamper monkey",
+    "web extension"
+  ],
+  "repository": "https://github.com/afeireal/cloud-disk-plugin",
   "description": "Batch rename files of cloud disk.",
   "scripts": {
     "dev": "vite",
