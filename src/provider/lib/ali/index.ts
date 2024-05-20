@@ -1,9 +1,10 @@
-import type { IListItem, IOriginListItem, TRootElementInsertMethod } from "@/provider/interface";
+import type { IListItem, IOriginListItem } from "@/provider/interface";
 
 import EnterComponent from "./EnterComponent.vue";
 import Provider from "@/provider/interface";
 import querySelector from "@/utils/querySelector";
 import fileNameParse from "@/utils/fileNameParse";
+import { ROOT_ELEMENT_INSERT_METHOD_APPEND } from "@/provider/interface";
 import { findReactFiberNode, getRootReactContainer } from "@/utils/reactFiber";
 
 export default class ProviderAli extends Provider {
@@ -13,7 +14,7 @@ export default class ProviderAli extends Provider {
   type = "ali";
   rootElementId = "cloud-disk-plugin";
   rootElementInsertTarget = "[class^=nav-tab-content--]";
-  rootElementInsertMethod: TRootElementInsertMethod = "append";
+  rootElementInsertMethod = ROOT_ELEMENT_INSERT_METHOD_APPEND;
 
   EnterComponent = () => EnterComponent;
 
