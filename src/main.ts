@@ -13,11 +13,11 @@ const providerRef: Ref<Provider | undefined> = ref();
 const getProviderRef = (): Ref<Provider | undefined> => {
   const instance = getProvider();
 
-  if ((!providerRef.value && instance) || (providerRef.value && !instance)) {
+  if (providerRef.value !== instance) {
     providerRef.value = instance;
   }
 
-  return providerRef as Ref<Provider | undefined>;
+  return providerRef;
 };
 
 const loop = () => {
@@ -44,9 +44,12 @@ const loop = () => {
   }
 };
 
-while (window?.parent === window) {
-  loop();
-  await sleep(300);
-}
+const main = async () => {
+  while (window?.parent === window) {
+    loop();
+    await sleep(300);
+  }
+};
 
+main();
 // document.querySelector("#app")._vnode.component.subTree.component.subTree.children[0].children[0].component.subTree.component.subTree.children[0].children[1].children[1].component.subTree.children[0].component.subTree.component.subTree.children[0].children[1].ctx.subTree.children[0].children[1].children[1].component.subTree.children[0].children[0].children[0].children[0].children[0].children[0].children
