@@ -529,8 +529,8 @@ export const RENAME_MODE_SERIES: TRenameMode = "series";
 export const RENAME_MODE_PATTERN: TRenameMode = "pattern";
 
 export type TRootElementInsertMethod = "append" | "prepend";
-export const ROOT_ELEMENT_INSERT_METHOD_APPEND = "append";
-export const ROOT_ELEMENT_INSERT_METHOD_PREPEND = "prepend";
+export const ROOT_ELEMENT_INSERT_METHOD_APPEND: TRootElementInsertMethod = "append";
+export const ROOT_ELEMENT_INSERT_METHOD_PREPEND: TRootElementInsertMethod = "prepend";
 
 export interface IOriginListItem {
   id: string;
@@ -540,13 +540,13 @@ export interface IOriginListItem {
   fullFileName: string;
 }
 
-type IListItemStatus = "none" | "ready" | "pending" | "success" | "fail";
+type TListItemStatus = "none" | "ready" | "pending" | "success" | "fail";
 
 export interface IListItem {
   id: string;
   ext: string;
   path?: string;
-  status: IListItemStatus;
+  status: TListItemStatus;
   isEmpty: boolean;
   isError: boolean;
   isRepeat: boolean;

@@ -3,13 +3,23 @@ import type { Ref, ComputedRef } from "vue";
 import { ref, computed, onMounted } from "vue";
 import message from "@/utils/message";
 
-const useVersion = () => {
-  const oneDay = 86400000;
-  const regexp = /@version\s+(.+)\n/;
+const oneDay = 86400000;
+const regexp = /@version\s+(.+)\n/;
 
-  const updateHref: string = import.meta.env.VITE_PLUGIN_UPDATE_URL;
-  const localVersion: string = import.meta.env.VITE_VERSION;
-  const remoteVersion = ref(localStorage.getItem("cdp_remoteVersion") || "");
+const pluginMode: "tamper-monkey" | "web-extension" = import.meta.env.VITE_PLUGIN_MODE;
+const updateHref: string = import.meta.env.VITE_PLUGIN_UPDATE_URL;
+const localVersion: string = import.meta.env.VITE_VERSION;
+
+const useVersion = () => {
+  if (pluginMode === "web-extension") {
+    return {
+      versionVisible: false,
+    };
+  }
+  // const remoteVersion = ref(
+  //   pluginMode === "web-extension" ? localVersion : localStorage.getItem("cdp_remoteVersion") || ""
+  // );
+  const remoteVersion = ref(localStorage.getItem("cdp_remoteVersion"));
   const compareVersions = computed(() => {
     if (!remoteVersion.value || !localVersion) {
       return 0;
@@ -27,17 +37,24 @@ const useVersion = () => {
     return 0;
   });
   const hasNewVersion = computed(() => compareVersions.value === 1);
-  const getRemoteVersionLoading = ref(false);
+  const versionLoading = ref(false);
 
   let checkVersionTime: number = parseInt(localStorage.getItem("cdp_checkVersionTime") || "0");
 
   let getRemoteVersionInstance: Promise<void>;
   const getRemoteVersion = () => {
-    if (getRemoteVersionLoading.value) {
+    // if (pluginMode === "web-extension") {
+    //   checkVersionTime = Date.now();
+    //   localStorage.setItem("cdp_checkVersionTime", checkVersionTime + "");
+    //   remoteVersion.value = localVersion;
+    //   localStorage.setItem("cdp_remoteVersion", remoteVersion.value);
+    //   return Promise.resolve();
+    // }
+    if (versionLoading.value) {
       return getRemoteVersionInstance;
     }
 
-    getRemoteVersionLoading.value = true;
+    versionLoading.value = true;
 
     const now = Date.now();
 
@@ -56,7 +73,7 @@ const useVersion = () => {
         localStorage.setItem("cdp_remoteVersion", remoteVersion.value);
       })
       .finally(() => {
-        getRemoteVersionLoading.value = false;
+        versionLoading.value = false;
       });
 
     return getRemoteVersionInstance;
@@ -64,7 +81,7 @@ const useVersion = () => {
 
   let checkVersionInstance: Promise<void>;
   const checkVersion = () => {
-    if (getRemoteVersionLoading.value) {
+    if (versionLoading.value) {
       return checkVersionInstance;
     }
     checkVersionInstance = getRemoteVersion()
@@ -97,18 +114,20 @@ const useVersion = () => {
     localVersion,
     remoteVersion,
     hasNewVersion,
-    getRemoteVersionLoading,
+    versionLoading,
+    versionVisible: true,
     checkVersion,
   };
 };
 
 export interface IVersion {
-  updateHref: string;
-  localVersion: string;
-  remoteVersion: Ref<string>;
-  hasNewVersion: ComputedRef<boolean>;
-  getRemoteVersionLoading: Ref<boolean>;
-  checkVersion: () => Promise<void>;
+  updateHref?: string;
+  localVersion?: string;
+  remoteVersion?: Ref<string>;
+  hasNewVersion?: ComputedRef<boolean>;
+  versionLoading?: Ref<boolean>;
+  versionVisible: boolean;
+  checkVersion?: () => Promise<void>;
 }
 
 export default useVersion;

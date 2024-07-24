@@ -5,13 +5,13 @@
     "src/**/*.tsx",
     "src/**/*.vue",
     "src/**/*.d.ts",
-    "vite.config.ts",
+    "vite.config.ts"
   ],
-  "exclude": ["src/**/__tests__/*"],
   "extends": "@vue/tsconfig/tsconfig.dom.json",
   "compilerOptions": {
     "jsx": "preserve",
-    "lib": ["ESNext", "DOM"],
+    "lib": ["DOM", "ESNext"],
+    "types": ["chrome"],
     "paths": { "@/*": ["./src/*"] },
     "noEmit": true,
     "strict": true,
@@ -25,6 +25,6 @@
     "moduleResolution": "Node",
     "resolveJsonModule": true,
     "useDefineForClassFields": true,
-    "allowSyntheticDefaultImports": true,
-  },
+    "allowSyntheticDefaultImports": true
+  }
 }
