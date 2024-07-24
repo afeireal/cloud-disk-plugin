@@ -18,82 +18,84 @@
       </span>
     </div>
     <div class="rename-preview-content">
-      <ul class="rename-preview-grid rename-preview-grid-header">
-        <li
-          class="rename-preview-grid-item"
-          :class="{
-            'is-error': providerRef.hasError,
-            'is-change': providerRef.hasChange,
-            'is-checked': !providerRef.hasUncheckedAll,
-          }"
-        >
-          <div class="rename-preview-grid-item-checkbox">
-            <component-checkbox
-              :model-value="providerRef.hasCheckedAll"
-              :indeterminate="!providerRef.hasCheckedAll && !providerRef.hasUncheckedAll"
-              @update:model-value="onCheckedAllUpdate"
-            ></component-checkbox>
-          </div>
-          <div class="rename-preview-grid-item-old-file-name">原文件名</div>
-          <div class="rename-preview-grid-item-right-arrow">⮕</div>
-          <div class="rename-preview-grid-item-new-file-name">新文件名</div>
-          <div class="rename-preview-grid-item-new-file-status">
-            <component-icon
-              :name="
-                providerRef.hasError
-                  ? 'frown'
-                  : !providerRef.hasChange
-                    ? 'meh'
-                    : providerRef.shouldContinue
-                      ? 'smile'
-                      : ''
-              "
-            ></component-icon>
-          </div>
-        </li>
-      </ul>
-      <ul class="rename-preview-grid rename-preview-grid-body">
-        <li
-          v-for="item in currentList"
-          :key="item.id"
-          class="rename-preview-grid-item"
-          :class="{
-            'is-error': item.isError,
-            'is-change': item.isChange,
-            'is-checked': item.isChecked,
-          }"
-        >
-          <div class="rename-preview-grid-item-checkbox">
-            <component-checkbox
-              :model-value="item.isChecked"
-              :readonly="item.status !== 'none'"
-              @update:model-value="onItemIsCheckedUpdate(item, $event)"
-            ></component-checkbox>
-          </div>
-          <div class="rename-preview-grid-item-old-file-name" :title="item.oldFileName">
-            {{ item.oldFileName }}
-          </div>
-          <div class="rename-preview-grid-item-right-arrow">⮕</div>
-          <div class="rename-preview-grid-item-new-file-name" :title="item.newFileName">
-            {{ item.newFileName }}
-          </div>
-          <div class="rename-preview-grid-item-new-file-status">
-            <component-icon
-              :name="
-                item.status === 'ready'
-                  ? 'timeCircle'
-                  : item.status === 'pending'
-                    ? 'loading'
-                    : item.status === 'success'
-                      ? 'checkCircle'
-                      : item.status === 'fail'
-                        ? 'close'
+      <div class="rename-preview-content-grid">
+        <ul class="rename-preview-content-grid-header">
+          <li
+            class="rename-preview-content-grid-item"
+            :class="{
+              'is-error': providerRef.hasError,
+              'is-change': providerRef.hasChange,
+              'is-checked': !providerRef.hasUncheckedAll,
+            }"
+          >
+            <div class="rename-preview-content-grid-item-checkbox">
+              <component-checkbox
+                :model-value="providerRef.hasCheckedAll"
+                :indeterminate="!providerRef.hasCheckedAll && !providerRef.hasUncheckedAll"
+                @update:model-value="onCheckedAllUpdate"
+              ></component-checkbox>
+            </div>
+            <div class="rename-preview-content-grid-item-old-file-name">原文件名</div>
+            <div class="rename-preview-content-grid-item-right-arrow">⮕</div>
+            <div class="rename-preview-content-grid-item-new-file-name">新文件名</div>
+            <div class="rename-preview-content-grid-item-new-file-status">
+              <component-icon
+                :name="
+                  providerRef.hasError
+                    ? 'frown'
+                    : !providerRef.hasChange
+                      ? 'meh'
+                      : providerRef.shouldContinue
+                        ? 'smile'
                         : ''
-              "
-            ></component-icon>
-          </div>
-        </li>
-      </ul>
+                "
+              ></component-icon>
+            </div>
+          </li>
+        </ul>
+        <ul class="rename-preview-content-grid-body">
+          <li
+            v-for="item in currentList"
+            :key="item.id"
+            class="rename-preview-content-grid-item"
+            :class="{
+              'is-error': item.isError,
+              'is-change': item.isChange,
+              'is-checked': item.isChecked,
+            }"
+          >
+            <div class="rename-preview-content-grid-item-checkbox">
+              <component-checkbox
+                :model-value="item.isChecked"
+                :readonly="item.status !== 'none'"
+                @update:model-value="onItemIsCheckedUpdate(item, $event)"
+              ></component-checkbox>
+            </div>
+            <div class="rename-preview-content-grid-item-old-file-name" :title="item.oldFileName">
+              {{ item.oldFileName }}
+            </div>
+            <div class="rename-preview-content-grid-item-right-arrow">⮕</div>
+            <div class="rename-preview-content-grid-item-new-file-name" :title="item.newFileName">
+              {{ item.newFileName }}
+            </div>
+            <div class="rename-preview-content-grid-item-new-file-status">
+              <component-icon
+                :name="
+                  item.status === 'ready'
+                    ? 'timeCircle'
+                    : item.status === 'pending'
+                      ? 'loading'
+                      : item.status === 'success'
+                        ? 'checkCircle'
+                        : item.status === 'fail'
+                          ? 'close'
+                          : ''
+                "
+              ></component-icon>
+            </div>
+          </li>
+        </ul>
+      </div>
     </div>
 
     <component-loading v-if="providerRef.isPreviewLoading"></component-loading>
@@ -189,47 +191,49 @@ export default defineComponent({
   color: inherit;
   font-size: var(--cdp-font-size);
 }
-.rename-preview-content {
+.rename-preview-content-grid {
   overflow: auto;
   position: relative;
   max-height: 50vh;
 }
-.rename-preview-grid {
+.rename-preview-content-grid-body,
+.rename-preview-content-grid-header {
   display: grid;
   grid-gap: var(--cdp-gutter);
   font-size: var(--cdp-font-size-sm);
   line-height: 1;
+  grid-auto-rows: 1em;
   grid-template-columns: auto minmax(200px, 1fr) auto minmax(200px, 1fr) 2em;
 }
-.rename-preview-grid-header {
+.rename-preview-content-grid-header {
   top: 0;
   z-index: 1;
   position: sticky;
   margin-bottom: var(--cdp-gutter);
   background-color: var(--cdp-color-white);
 }
-.rename-preview-grid-item {
+.rename-preview-content-grid-item {
   color: var(--cdp-color-gray-300);
   display: contents;
   transition: color var(--cdp-transition-default);
 }
-.rename-preview-grid-item.is-checked {
+.rename-preview-content-grid-item.is-checked {
   color: var(--cdp-color-gray-600);
 }
-.rename-preview-grid-item.is-checked.is-change {
+.rename-preview-content-grid-item.is-checked.is-change {
   color: var(--cdp-color-gray-900);
 }
-.rename-preview-grid-item.is-checked.is-error {
+.rename-preview-content-grid-item.is-checked.is-error {
   color: var(--cdp-color-red);
 }
-.rename-preview-grid-item-old-file-name,
-.rename-preview-grid-item-new-file-name,
-.rename-preview-grid-item-new-file-status {
+.rename-preview-content-grid-item-old-file-name,
+.rename-preview-content-grid-item-new-file-name,
+.rename-preview-content-grid-item-new-file-status {
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
 }
-.rename-preview-grid-item-new-file-status {
+.rename-preview-content-grid-item-new-file-status {
   display: flex;
   text-align: right;
   align-items: center;

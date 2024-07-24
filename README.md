@@ -55,6 +55,8 @@
 
 - 输入正则与替换文本
 - 正则替换模式使用 Javascript 的 `String.prototype.replace` 方法，建议有正则基础的用户使用
+- [关于正则表达式](https://www.runoob.com/regexp/regexp-syntax.html)
+- [学习正则表达式](https://regexlearn.com/zh-cn)
 
 <img src="https://cdn.jsdelivr.net/gh/afeireal/cloud-disk-plugin@1.0.2/image/readme/screenshot_main_panel_pattern_example.png" alt="正则模式案例" width="500" />
 

@@ -1,10 +1,11 @@
-import type { IListItem, IOriginListItem, TRootElementInsertMethod } from "@/provider/interface";
+import type { IListItem, IOriginListItem } from "@/provider/interface";
 
 import EnterComponent from "./EnterComponent.vue";
 import Provider from "@/provider/interface";
 import sleep from "@/utils/sleep";
 import querySelector from "@/utils/querySelector";
 import fileNameParse from "@/utils/fileNameParse";
+import { ROOT_ELEMENT_INSERT_METHOD_APPEND } from "@/provider/interface";
 
 export default class ProviderBaidu extends Provider {
   static test = () =>
@@ -13,7 +14,7 @@ export default class ProviderBaidu extends Provider {
   type = "baidu";
   rootElementId = "cloud-disk-plugin";
   rootElementInsertTarget = ".wp-s-aside-nav__main-top";
-  rootElementInsertMethod: TRootElementInsertMethod = "append";
+  rootElementInsertMethod = ROOT_ELEMENT_INSERT_METHOD_APPEND;
   maxTask = 50;
 
   EnterComponent = () => EnterComponent;
