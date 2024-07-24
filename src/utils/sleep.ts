@@ -1,7 +1,9 @@
 const sleep = (timeout: number) => {
-  return new Promise((resolve) => {
-    setTimeout(resolve, timeout);
-  });
+  return timeout > 0
+    ? new Promise((resolve) => {
+        setTimeout(resolve, timeout, timeout);
+      })
+    : Promise.resolve(timeout);
 };
 
 export default sleep;

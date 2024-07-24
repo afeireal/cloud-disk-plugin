@@ -1,8 +1,9 @@
-import type { IListItem, IOriginListItem, TRootElementInsertMethod } from "@/provider/interface";
+import type { IListItem, IOriginListItem } from "@/provider/interface";
 
 import EnterComponent from "./EnterComponent.vue";
 import Provider from "@/provider/interface";
 import fileNameParse from "@/utils/fileNameParse";
+import { ROOT_ELEMENT_INSERT_METHOD_PREPEND } from "@/provider/interface";
 import { findReactFiberNode, getRootReactContainer } from "@/utils/reactFiber";
 
 export default class ProviderQuark extends Provider {
@@ -13,7 +14,7 @@ export default class ProviderQuark extends Provider {
   rootElementInsertTarget =
     "#ice-container .section-main > .section-header.list-header > .btn-operate > .btn-main";
 
-  rootElementInsertMethod: TRootElementInsertMethod = "prepend";
+  rootElementInsertMethod = ROOT_ELEMENT_INSERT_METHOD_PREPEND;
 
   EnterComponent = () => EnterComponent;
 
