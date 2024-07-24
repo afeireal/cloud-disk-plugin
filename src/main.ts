@@ -15,6 +15,13 @@ const getProviderRef = (): Ref<Provider | undefined> => {
 
   if (providerRef.value !== instance) {
     providerRef.value = instance;
+    Object.assign(window, {
+      _toggleCloudDiskPlugin: () => {
+        if (providerRef.value) {
+          providerRef.value.setVisible(!providerRef.value.visible);
+        }
+      },
+    });
   }
 
   return providerRef;

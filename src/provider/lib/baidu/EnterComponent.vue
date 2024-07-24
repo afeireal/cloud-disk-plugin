@@ -1,6 +1,6 @@
 <template>
-  <div class="enter-component">
-    <button type="button" class="enter-component-button" @click="onClick">
+  <div class="enter-component" @click="onClick">
+    <button type="button" class="enter-component-button">
       <span class="enter-component-button-icon">
         <component-icon name="editCircle"></component-icon>
       </span>
@@ -35,29 +35,29 @@ export default defineComponent({
 </script>
 <style scoped>
 .enter-component {
+  padding-top: 2px;
+  margin-bottom: 1px;
+}
+.enter-component-button {
   width: 58px;
   color: #636d7e;
+  cursor: pointer;
   display: inline-block;
   position: relative;
   font-size: 11px;
   margin-top: 0;
   min-height: 60px;
-  padding-top: 2px;
-  margin-bottom: 1px;
   border-radius: 8px;
-}
-.enter-component:hover {
-  background-color: #f1f3f8;
-}
-.enter-component-button {
-  position: relative;
-  text-align: center;
   background-color: transparent;
 }
+.enter-component-button:hover {
+  background-color: #f1f3f8;
+}
 .enter-component-button-icon {
-  display: block;
+  display: flex;
   font-size: 24px;
   margin-top: 6px;
+  justify-content: center;
 }
 .enter-component-button-text {
   display: block;

@@ -9,7 +9,9 @@ import { findReactFiberNode, getRootReactContainer } from "@/utils/reactFiber";
 
 export default class ProviderAli extends Provider {
   static test = () =>
-    /^https:\/\/www\.ali(pan|yundrive)\.com\/drive\/file\/(backup|resource)/.test(location.href);
+    /^https:\/\/www\.ali(pan|yundrive)\.com\/drive\/file\/(all|backup|resource)/.test(
+      location.href
+    );
 
   type = "ali";
   rootElementId = "cloud-disk-plugin";

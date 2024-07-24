@@ -2,23 +2,25 @@
   <div v-if="providerRef" class="rename-control">
     <div class="rename-control-header">
       <span class="rename-control-header-content"> 批量重命名当前目录下所有文件 </span>
-      <a
-        v-if="hasNewVersion"
-        :href="updateHref"
-        target="_blank"
-        class="rename-control-header-remote-version"
-      >
-        发现新版本：{{ remoteVersion }} 点击更新
-      </a>
-      <span
-        v-else
-        class="rename-control-header-local-version"
-        title="点击检查更新"
-        @click="checkVersion"
-      >
-        <component-icon v-if="getRemoteVersionLoading" name="loading"></component-icon>
-        当前版本：{{ localVersion }}
-      </span>
+      <template v-if="version.versionVisible">
+        <a
+          v-if="version.hasNewVersion"
+          :href="version.updateHref"
+          target="_blank"
+          class="rename-control-header-remote-version"
+        >
+          发现新版本：{{ version.remoteVersion }} 点击更新
+        </a>
+        <span
+          v-else
+          class="rename-control-header-local-version"
+          title="点击检查更新"
+          @click="version.checkVersion"
+        >
+          <component-icon v-if="version.versionLoading" name="loading"></component-icon>
+          当前版本：{{ version.localVersion }}
+        </span>
+      </template>
     </div>
     <div v-if="providerRef.replaceParams" class="rename-control-body">
       <template v-if="providerRef.replaceParams.renameMode === 'series'">
@@ -133,7 +135,7 @@ export default defineComponent({
     };
 
     return {
-      ...version,
+      version,
       providerRef,
       isDisabled,
       onResetClick,
