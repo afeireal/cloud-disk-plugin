@@ -1,4 +1,4 @@
-import type { IListItem, IOriginListItem } from "@/provider/interface";
+import type { IListItem } from "@/provider/interface";
 
 import EnterComponent from "./EnterComponent.vue";
 import Provider from "@/provider/interface";
