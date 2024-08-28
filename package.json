@@ -4,7 +4,7 @@
   "cnName": "网盘文件批量重命名",
   "author": "afeireal",
   "license": "MIT",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "keywords": [
     "网盘",
     "重命名",
@@ -17,7 +17,7 @@
   ],
   "repository": "https://github.com/afeireal/cloud-disk-plugin",
   "description": "Batch rename files of cloud disk.",
-  "cnDescription": "网盘文件批量重命名插件，支持百度网盘、阿里云盘、夸克网盘。",
+  "cnDescription": "网盘文件批量重命名插件，支持百度网盘、阿里云盘、夸克网盘、PikPak云盘。",
   "scripts": {
     "dev:tamper-monkey": "vite --mode tamper-monkey",
     "dev:web-extension": "vite --mode web-extension-dev",

@@ -15,6 +15,7 @@ const urlSchemes = [
   "https://pan.baidu.com/*",
   "https://www.alipan.com/*",
   "https://www.aliyundrive.com/*",
+  "https://mypikpak.com/*"
 ];
 
 export default defineConfig(({ mode, command, isPreview, isSsrBuild }) => {
