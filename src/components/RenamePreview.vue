@@ -192,6 +192,7 @@ export default defineComponent({
   font-size: var(--cdp-font-size);
 }
 .rename-preview-content-grid {
+  height: 100%;
   overflow: auto;
   position: relative;
   max-height: 50vh;
