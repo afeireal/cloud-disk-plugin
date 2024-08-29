@@ -9,7 +9,7 @@
 - ✅ 百度网盘
 - ✅ 阿里云盘
 - ✅ 夸克网盘
-<!-- - ❎ PikPak -->
+- ✅ PikPak云盘
 
 百度网盘入口
 
@@ -22,6 +22,10 @@
 夸克网盘入口
 
 <img src="https://cdn.jsdelivr.net/gh/afeireal/cloud-disk-plugin/image/readme/screenshot_enter_button_quark.png" alt="夸克网盘入口" />
+
+PikPak云盘入口
+
+<img src="https://cdn.jsdelivr.net/gh/afeireal/cloud-disk-plugin/image/readme/screenshot_enter_button_pikpak.png" alt="PikPak云盘入口" />
 
 ## 使用方法
 
