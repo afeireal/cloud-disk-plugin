@@ -164,6 +164,9 @@ export default defineComponent({
 .rename-control-header-content {
   font-size: var(--cdp-font-size-lg);
 }
+.rename-control-header-local-version {
+  display: flex;
+}
 .rename-control-header-local-version,
 .rename-control-header-remote-version {
   cursor: pointer;
