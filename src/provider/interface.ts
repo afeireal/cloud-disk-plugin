@@ -165,6 +165,15 @@ export abstract class Provider {
             }
           });
         }
+      } else {
+        // 没有输入正则时表示加前缀，例如: "12.mp4".replace("", "剧集.S01E"); // "剧集.S01E12.mp4"
+        result.forEach((item, index) => {
+          item.newFileName = item.oldFileName.replace(
+            '',
+            this.replaceParams.replace
+          );
+          this._listItemGeneralMethod(item, newFileNameSet);
+        });
       }
     }
 
