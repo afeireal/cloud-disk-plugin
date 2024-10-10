@@ -133,7 +133,7 @@ export abstract class Provider {
 
       if (this.replaceParams.pattern) {
         try {
-          regexp = new RegExp(this.replaceParams.pattern);
+          regexp = new RegExp(this.replaceParams.pattern, "g");
         } catch (error) {
           console.error("regexp error", error);
         }
