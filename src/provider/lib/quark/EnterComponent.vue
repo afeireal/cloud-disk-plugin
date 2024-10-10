@@ -46,7 +46,8 @@ export default defineComponent({
   margin-right: 12px;
 }
 .enter-component-button {
-  color: #52565e;
+  /* color: #52565e; */
+  color: var(--cdp-color-blue);
   cursor: pointer;
   height: 36px;
   border: 1px solid #ddd;
