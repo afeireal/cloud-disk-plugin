@@ -40,7 +40,8 @@ export default defineComponent({
 }
 .enter-component-button {
   width: 58px;
-  color: #636d7e;
+  /* color: #636d7e; */
+  color: var(--cdp-color-blue);
   cursor: pointer;
   display: inline-block;
   position: relative;

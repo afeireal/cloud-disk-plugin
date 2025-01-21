@@ -37,7 +37,8 @@ export default defineComponent({
 <style scoped>
 .enter-component-button {
   width: 100%;
-  color: var(--color-secondary-text);
+  /* color: var(--color-secondary-text); */
+  color: var(--cdp-color-blue);
   height: 44px;
   border: none;
   cursor: pointer;
