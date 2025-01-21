@@ -280,7 +280,7 @@ export default defineComponent({
 }
 .rename-preview-content-table {
   width: 100%;
-  height: 100%;
+  /* height: 100%; */
   position: relative;
   font-size: var(--cdp-font-size-sm);
   line-height: var(--cdp-font-size-sm);
@@ -330,6 +330,7 @@ export default defineComponent({
   -moz-user-select: none; /* Firefox */
   -ms-user-select: none; /* IE 10+ */
   user-select: none; /* 标准语法 */
+  white-space: nowrap;
 }
 .rename-preview-content-table-item-index-reset-sort {
   cursor: pointer;
