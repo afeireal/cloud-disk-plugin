@@ -1,6 +1,11 @@
 import type { Component } from "vue";
+import type { Change } from "diff";
 
+import { diffChars } from "diff";
+import Sortable from "sortablejs";
 import message from "@/utils/message";
+import { isArray, isNumber } from "@/utils/is";
+import querySelector from "@/utils/querySelector";
 import complementZero from "@/utils/complementZero";
 
 export abstract class Provider {
@@ -39,19 +44,30 @@ export abstract class Provider {
     }
     this.visible = val;
     if (val) {
-      this._updateOriginList();
+      this._updateOriginList().then(() => {
+        this._initDragSort();
+      });
+    } else {
+      this._destroyDragSort();
     }
   }
 
   // 替换参数
-  public replaceParams: ReplaceParams = new ReplaceParams(() =>
-    this._onReplaceParamsUpdate.call(this)
-  );
+  public replaceParams: ReplaceParams = new ReplaceParams({
+    onUpdateHandler: () => this._onReplaceParamsUpdate.call(this),
+    onChangeHandler: (key: TReplaceParamsKeys, data: ReplaceParams) =>
+      this._onReplaceParamsChange.call(this, key, data),
+  });
   // 替换参数禁用
   public replaceParamsDisabled: boolean = false;
   // 替换参数更新回调函数
   private _onReplaceParamsUpdate() {
     this._updateCurrentList();
+  }
+  private _onReplaceParamsChange(key: TReplaceParamsKeys, data: ReplaceParams) {
+    if (key === "sortChecked") {
+      this._onSortCheckedChange(data[key]);
+    }
   }
   // 重置替换参数
   private _resetReplaceParams() {
@@ -63,19 +79,24 @@ export abstract class Provider {
   // 获取原始文件列表数据
   protected abstract getOriginList(): Promise<IOriginListItem[]>;
   // 更新原始文件列表数据
-  private _updateOriginList(): void {
+  private _updateOriginList(): Promise<IListItem[]> {
     this.isLoading = true;
-    this._uncheckedList = new Set();
-    this.getOriginList()
+    this._clearIndexMap();
+    this._clearUncheckedList();
+    return this.getOriginList()
       .then((res) => {
+        this._clearIndexMap();
         this.isLoading = false;
         this.originList = res;
-        this._updateCurrentList();
+        this._initListItemIndex();
+        return this._updateCurrentList();
       })
       .catch(() => {
+        this._clearIndexMap();
         this.isLoading = false;
         this.originList = [];
         this._updateCurrentList();
+        return [];
       });
   }
 
@@ -85,15 +106,17 @@ export abstract class Provider {
     return this._currentList;
   }
   // 更新当前文件列表数据
-  private _updateCurrentList(): void {
+  private _updateCurrentList(): IListItem[] {
+    console.log("_updateCurrentList");
     const renameMode = this.replaceParams.renameMode;
 
-    const result: IListItem[] = this.originList.map((item) => {
+    let result: IListItem[] = this.originList.map((item) => {
       return {
         id: item.id,
         ext: item.ext,
         path: item.path,
-        status: "none",
+        index: this._getListItemIndex(item.id),
+        status: LIST_ITEM_STATUS_NONE,
         isEmpty: false,
         isError: false,
         isRepeat: false,
@@ -104,8 +127,11 @@ export abstract class Provider {
         isLoading: false,
         oldFileName: item.fullFileName,
         newFileName: "",
+        displayIndex: this._getListItemDisplayIndex(item.id),
       };
     });
+
+    result = result.sort((a, b) => a.index - b.index);
 
     const newFileNameSet: Set<string> = new Set();
 
@@ -114,11 +140,11 @@ export abstract class Provider {
         const season = this.replaceParams.season
           ? ".S" + complementZero(this.replaceParams.season)
           : "";
-        result.forEach((item, index) => {
+        result.forEach((item) => {
           const fileName = this.replaceParams.title || item.fileName;
           let newFileName = fileName + season;
-          if (this.replaceParams.autoEpisode) {
-            const episode = (season ? "" : ".") + "E" + complementZero(index + 1);
+          if (this.replaceParams.autoEpisode && isNumber(item.displayIndex)) {
+            const episode = (season ? "" : ".") + "E" + complementZero(item.displayIndex);
             newFileName += episode;
           }
           newFileName += "." + item.ext;
@@ -138,7 +164,7 @@ export abstract class Provider {
           console.error("regexp error", error);
         }
         if (regexp) {
-          result.forEach((item, index) => {
+          result.forEach((item) => {
             if (this.replaceParams.autoEpisode) {
               item.isMatched = !!regexp?.test(item.fileName);
               if (item.isMatched) {
@@ -146,7 +172,9 @@ export abstract class Provider {
                   regexp as RegExp,
                   this.replaceParams.replace
                 );
-                newFileName += (newFileName ? ".E" : "E") + complementZero(index + 1);
+                if (isNumber(item.displayIndex)) {
+                  newFileName += (newFileName ? ".E" : "E") + complementZero(item.displayIndex);
+                }
                 if (newFileName) {
                   newFileName += "." + item.ext;
                 }
@@ -171,6 +199,8 @@ export abstract class Provider {
     this._currentList = result;
     this._updateStatus();
     this._emitCurrentListUpdateHandler();
+
+    return result;
   }
   // 文件列表项通用处理
   private _listItemGeneralMethod(item: IListItem, newFileNameSet: Set<string>) {
@@ -179,51 +209,11 @@ export abstract class Provider {
     item.isRepeat = item.isChecked && !!item.newFileName && newFileNameSet.has(item.newFileName);
     item.isError = item.isEmpty || item.isRepeat;
     item.isChecked && newFileNameSet.add(item.newFileName);
-  }
-
-  // 文件列表更新回调函数集合
-  private _currentListUpdateHandlerSet: Set<(currentList: IListItem[]) => void> = new Set();
-  // 绑定文件列表更新回调函数
-  public onCurrentListUpdate(handler: (currentList: IListItem[]) => void): void {
-    if (!this._currentListUpdateHandlerSet.has(handler)) {
-      this._currentListUpdateHandlerSet.add(handler);
-    }
-  }
-  // 解绑文件列表更新回调函数
-  public offCurrentListUpdate(handler: (currentList: IListItem[]) => void): void {
-    if (this._currentListUpdateHandlerSet.has(handler)) {
-      this._currentListUpdateHandlerSet.delete(handler);
-    }
-  }
-  // 触发文件列表更新回调函数
-  private _emitCurrentListUpdateHandler(): void {
-    this._currentListUpdateHandlerSet.forEach((handler) => {
-      handler(this._currentList);
-    });
-  }
-
-  // 取消选中的文件列表
-  private _uncheckedList: Set<string> = new Set();
-  // 更新是否选中文件列表
-  public updateItemIsCheck(item: IListItem, val: boolean): void {
-    if (val) {
-      this._uncheckedList.delete(item.id);
+    if (item.isChange) {
+      item.diffList = diffChars(item.oldFileName, item.newFileName);
     } else {
-      this._uncheckedList.add(item.id);
+      item.diffList = undefined;
     }
-    this._updateCurrentList();
-  }
-
-  // 更新是否全选
-  public updateCheckedAll(val: boolean): void {
-    if (val) {
-      this._uncheckedList = new Set();
-    } else {
-      this._currentList.forEach((item) => {
-        this._uncheckedList.add(item.id);
-      });
-    }
-    this._updateCurrentList();
   }
 
   // 空名计数
@@ -272,13 +262,13 @@ export abstract class Provider {
         item.isChange && changeCount++;
         item.isMatched && matchedCount++;
       }
-      if (item.status === "pending") {
+      if (item.status === LIST_ITEM_STATUS_PENDING) {
         pendingStatusCount++;
-      } else if (item.status === "success") {
+      } else if (item.status === LIST_ITEM_STATUS_SUCCESS) {
         successStatusCount++;
-      } else if (item.status === "ready") {
+      } else if (item.status === LIST_ITEM_STATUS_READY) {
         readyStatusCount++;
-      } else if (item.status === "fail") {
+      } else if (item.status === LIST_ITEM_STATUS_FAIL) {
         failStatusCount++;
       }
     });
@@ -302,7 +292,6 @@ export abstract class Provider {
 
     this._updateStatusList();
   }
-
   private _updateStatusList() {
     const result: IStatusList[] = [];
     if (!this._currentList.length) {
@@ -400,6 +389,193 @@ export abstract class Provider {
     this.statusList = result;
   }
 
+  // 文件列表更新回调函数集合
+  private _currentListUpdateHandlerSet: Set<(currentList: IListItem[]) => void> = new Set();
+  // 绑定文件列表更新回调函数
+  public onCurrentListUpdate(handler: (currentList: IListItem[]) => void): void {
+    if (!this._currentListUpdateHandlerSet.has(handler)) {
+      this._currentListUpdateHandlerSet.add(handler);
+    }
+  }
+  // 解绑文件列表更新回调函数
+  public offCurrentListUpdate(handler: (currentList: IListItem[]) => void): void {
+    if (this._currentListUpdateHandlerSet.has(handler)) {
+      this._currentListUpdateHandlerSet.delete(handler);
+    }
+  }
+  // 触发文件列表更新回调函数
+  private _emitCurrentListUpdateHandler(): void {
+    this._currentListUpdateHandlerSet.forEach((handler) => {
+      handler(this._currentList);
+    });
+  }
+
+  // 未选中的文件列表
+  private _uncheckedList: Set<string> = new Set();
+  // 更新是否选中文件列表
+  public updateItemIsChecked(item: IListItem, val: boolean): void {
+    item.isChecked = val;
+    if (val) {
+      this._uncheckedList.delete(item.id);
+    } else {
+      this._uncheckedList.add(item.id);
+    }
+    this._updateItemSortByIsChecked();
+    this._updateCurrentList();
+  }
+  // 更新是否全选
+  public updateCheckedAll(val: boolean): void {
+    this.hasCheckedAll = val;
+    this.hasUncheckedAll = !val;
+    if (val) {
+      this._uncheckedList = new Set();
+    } else {
+      this._currentList.forEach((item) => {
+        this._uncheckedList.add(item.id);
+      });
+    }
+    this._updateItemSortByCheckedAll(val);
+    this._updateCurrentList();
+  }
+  private _clearUncheckedList() {
+    this._uncheckedList.clear();
+  }
+
+  // 初始化拖动排序
+  private _sortableInstance: Sortable | null = null;
+  private _initDragSort() {
+    querySelector(".rename-preview-content-table-body", 10).then((res) => {
+      this._sortableInstance = Sortable.create(res, {
+        handle: ".rename-preview-content-table-item-index-handler",
+        filter: ".rename-preview-content-table-item.block-drop",
+        draggable: ".rename-preview-content-table-item",
+        ghostClass: "rename-preview-content-table-item-placeholder",
+        fallbackClass: "rename-preview-content-table-item-dragged",
+        forceFallback: true,
+        onSort: (event) => {
+          if (isNumber(event.newIndex) && isNumber(event.oldIndex)) {
+            this._sortListItem(event.newIndex, event.oldIndex);
+          }
+        },
+      });
+    });
+  }
+  private _destroyDragSort() {
+    if (this._sortableInstance) {
+      this._sortableInstance.destroy();
+      this._sortableInstance = null;
+    }
+  }
+  // 排序
+  private _indexMap: Map<string, { index: number; displayIndex?: number }> = new Map();
+  private _clearIndexMap(): void {
+    this._indexMap.clear();
+  }
+  private _initListItemIndex() {
+    this.originList.forEach((item, index) => {
+      this._setListItemIndex(item.id, index);
+    });
+  }
+  private _setListItemIndex(id: string, index: number): number {
+    const temp = this._indexMap.get(id);
+    if (!temp) {
+      this._indexMap.set(id, { index, displayIndex: index + 1 });
+    } else if (temp.index !== index) {
+      temp.index = index;
+    }
+    return index;
+  }
+  private _setListItemDisplayIndex(id: string, displayIndex?: number): number | undefined {
+    const temp = this._indexMap.get(id);
+    if (!temp) {
+      if (displayIndex) {
+        this._indexMap.set(id, { index: displayIndex - 1, displayIndex });
+      } else {
+        this._indexMap.set(id, { index: this._findListItemIndex(id) });
+      }
+    } else if (temp.displayIndex !== displayIndex) {
+      temp.displayIndex = displayIndex;
+    }
+    return displayIndex;
+  }
+  private _getListItemIndex(id: string): number {
+    const temp = this._indexMap.get(id);
+    if (temp) {
+      return temp.index;
+    }
+    return this._findListItemIndex(id);
+  }
+  private _getListItemDisplayIndex(id: string): number | undefined {
+    const temp = this._indexMap.get(id);
+    if (temp) {
+      return temp.displayIndex;
+    }
+    return this._findListItemIndex(id) + 1;
+  }
+  private _findListItemIndex(id: string): number {
+    let index = this.originList.findIndex((item) => item.id === id);
+    if (index !== -1) {
+      index = this.originList.length;
+    }
+    this._setListItemIndex(id, index);
+    return index;
+  }
+  private _sortListItem(newIndex: number, oldIndex: number): void {
+    if (newIndex === oldIndex) {
+      return;
+    }
+    const currentList = [...this._currentList];
+    currentList.splice(newIndex, 0, currentList.splice(oldIndex, 1)[0]);
+    const start = newIndex > oldIndex ? oldIndex : newIndex;
+    const end = newIndex > oldIndex ? newIndex : oldIndex;
+    for (let index = start; index <= end; index++) {
+      this._setListItemIndex(currentList[index].id, index);
+      if (!this.replaceParams.sortChecked) {
+        this._setListItemDisplayIndex(currentList[index].id, index + 1);
+      }
+    }
+    if (this.replaceParams.sortChecked) {
+      let index = 1;
+      currentList.forEach((item) => {
+        this._setListItemDisplayIndex(item.id, item.isChecked ? index++ : undefined);
+      });
+    }
+    this._updateCurrentList();
+  }
+  private _updateItemSortByIsChecked() {
+    if (this.replaceParams.sortChecked) {
+      let index = 1;
+      this._currentList.forEach((item) => {
+        this._setListItemDisplayIndex(item.id, item.isChecked ? index++ : undefined);
+      });
+    }
+  }
+  private _updateItemSortByCheckedAll(val: boolean) {
+    if (this.replaceParams.sortChecked) {
+      if (val) {
+        this._currentList.forEach((item, index) => {
+          this._setListItemDisplayIndex(item.id, index + 1);
+        });
+      } else {
+        this._currentList.forEach((item) => {
+          this._setListItemDisplayIndex(item.id);
+        });
+      }
+    }
+  }
+  private _onSortCheckedChange(val: boolean) {
+    if (val) {
+      let index = 1;
+      this._currentList.forEach((item) => {
+        this._setListItemDisplayIndex(item.id, item.isChecked ? index++ : undefined);
+      });
+    } else {
+      this._currentList.forEach((item, index) => {
+        this._setListItemDisplayIndex(item.id, index + 1);
+      });
+    }
+  }
+
   // 刷新数据
   protected abstract refresh(): Promise<any>;
   // 发起重命名请求
@@ -438,6 +614,12 @@ export abstract class Provider {
     this._resetReplaceParams();
     this._updateOriginList();
   }
+  // 重置排序
+  public resetSort(): void {
+    this._clearIndexMap();
+    this._initListItemIndex();
+    this._updateCurrentList();
+  }
 }
 
 export class ReplaceParams {
@@ -448,7 +630,7 @@ export class ReplaceParams {
   }
   public set title(val) {
     this._title = val;
-    this._onUpdate();
+    this._onUpdate("title");
   }
   // 季数
   private _season: string = "";
@@ -457,7 +639,7 @@ export class ReplaceParams {
   }
   public set season(val) {
     this._season = val;
-    this._onUpdate();
+    this._onUpdate("season");
   }
   // 正则
   private _pattern: string = "";
@@ -466,7 +648,7 @@ export class ReplaceParams {
   }
   public set pattern(val) {
     this._pattern = val;
-    this._onUpdate();
+    this._onUpdate("pattern");
   }
   // 替换文本
   private _replace: string = "";
@@ -475,7 +657,7 @@ export class ReplaceParams {
   }
   public set replace(val) {
     this._replace = val;
-    this._onUpdate();
+    this._onUpdate("replace");
   }
   // 自动集数
   public _autoEpisode: boolean = true;
@@ -484,7 +666,16 @@ export class ReplaceParams {
   }
   public set autoEpisode(val) {
     this._autoEpisode = val;
-    this._onUpdate();
+    this._onUpdate("autoEpisode");
+  }
+  // 排序已选
+  public _sortChecked: boolean = false;
+  public get sortChecked() {
+    return this._sortChecked;
+  }
+  public set sortChecked(val) {
+    this._sortChecked = val;
+    this._onUpdate("sortChecked");
   }
   // 重命名模式
   private _renameMode: TRenameMode = RENAME_MODE_SERIES;
@@ -493,36 +684,72 @@ export class ReplaceParams {
   }
   public set renameMode(val) {
     this._renameMode = val;
-    this._onUpdate();
+    this._onUpdate("renameMode");
   }
 
-  // private _onUpdateTimer: NodeJS.Timeout | undefined;
-  private _onUpdate = () => {
-    // if (this._onUpdateTimer) {
-    //   clearTimeout(this._onUpdateTimer);
-    // }
-    // this._onUpdateTimer = setTimeout(() => {
-    //   this.onUpdateHandler(this);
-    //   this._onUpdateTimer = undefined;
-    // }, 100);
-
-    this.onUpdateHandler && this.onUpdateHandler(this);
+  private _stopUpdate = false;
+  private _onUpdate = (key: TReplaceParamsKeys | TReplaceParamsKeys[]) => {
+    if (!this._stopUpdate) {
+      if (this._onChangeHandler) {
+        if (isArray(key)) {
+          for (let index = 0; index < key.length; index++) {
+            this._onChangeHandler(key[index], this);
+          }
+        } else {
+          this._onChangeHandler(key, this);
+        }
+      }
+      this._onUpdateHandler && this._onUpdateHandler(this);
+    }
   };
-  private onUpdateHandler: (replaceParams: ReplaceParams) => void;
+  private _onUpdateHandler?: (replaceParams: ReplaceParams) => void;
+  private _onChangeHandler?: (key: TReplaceParamsKeys, replaceParams: ReplaceParams) => void;
 
   public reset(val?: any) {
+    this._stopUpdate = true;
     this.title = val?.title || "";
     this.season = val?.season || "";
     this.pattern = val?.pattern || "";
     this.replace = val?.replace || "";
     this.autoEpisode = val ? !!val.autoEpisode : true;
+    this.sortChecked = val ? !!val.sortChecked : false;
     this.renameMode = val?.renameMode || RENAME_MODE_SERIES;
+    this._stopUpdate = false;
+    const keys: TReplaceParamsKeys[] = [
+      "title",
+      "season",
+      "pattern",
+      "replace",
+      "autoEpisode",
+      "sortChecked",
+      "renameMode",
+    ];
+    this._onUpdate(keys);
   }
 
-  constructor(onUpdateHandler: (replaceParams: ReplaceParams) => void) {
-    this.onUpdateHandler = onUpdateHandler;
+  constructor(
+    options: {
+      onUpdateHandler?: (replaceParams: ReplaceParams) => void;
+      onChangeHandler?: (key: TReplaceParamsKeys, replaceParams: ReplaceParams) => void;
+    } = {}
+  ) {
+    if (options.onUpdateHandler) {
+      this._onUpdateHandler = options.onUpdateHandler;
+    }
+    if (options.onChangeHandler) {
+      this._onChangeHandler = options.onChangeHandler;
+    }
   }
 }
+
+export type TReplaceParamsKeys =
+  | "title"
+  | "season"
+  | "pattern"
+  | "replace"
+  | "autoEpisode"
+  | "sortChecked"
+  | "renameMode";
 
 export type TRenameMode = "series" | "pattern";
 export const RENAME_MODE_SERIES: TRenameMode = "series";
@@ -536,27 +763,36 @@ export interface IOriginListItem {
   id: string;
   ext: string;
   path?: string;
+  index: number;
   fileName: string;
   fullFileName: string;
 }
 
-type TListItemStatus = "none" | "ready" | "pending" | "success" | "fail";
+export type TListItemStatus = "none" | "ready" | "pending" | "success" | "fail";
+export const LIST_ITEM_STATUS_NONE: TListItemStatus = "none";
+export const LIST_ITEM_STATUS_READY: TListItemStatus = "ready";
+export const LIST_ITEM_STATUS_PENDING: TListItemStatus = "pending";
+export const LIST_ITEM_STATUS_SUCCESS: TListItemStatus = "success";
+export const LIST_ITEM_STATUS_FAIL: TListItemStatus = "fail";
 
 export interface IListItem {
   id: string;
   ext: string;
   path?: string;
+  index: number;
   status: TListItemStatus;
   isEmpty: boolean;
   isError: boolean;
   isRepeat: boolean;
   fileName: string;
   isChange: boolean;
+  diffList?: Change[];
   isMatched: boolean;
   isChecked: boolean;
   isLoading: boolean;
   oldFileName: string;
   newFileName: string;
+  displayIndex?: number;
 }
 
 export interface IStatusList {

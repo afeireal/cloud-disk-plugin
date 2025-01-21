@@ -18,27 +18,44 @@
       </span>
     </div>
     <div class="rename-preview-content">
-      <div class="rename-preview-content-grid">
-        <ul class="rename-preview-content-grid-header">
-          <li
-            class="rename-preview-content-grid-item"
+      <table class="rename-preview-content-table">
+        <thead class="rename-preview-content-table-header">
+          <tr
+            class="rename-preview-content-table-item"
             :class="{
               'is-error': providerRef.hasError,
               'is-change': providerRef.hasChange,
               'is-checked': !providerRef.hasUncheckedAll,
             }"
           >
-            <div class="rename-preview-content-grid-item-checkbox">
+            <th class="rename-preview-content-table-item-checkbox">
               <component-checkbox
                 :model-value="providerRef.hasCheckedAll"
                 :indeterminate="!providerRef.hasCheckedAll && !providerRef.hasUncheckedAll"
                 @update:model-value="onCheckedAllUpdate"
               ></component-checkbox>
-            </div>
-            <div class="rename-preview-content-grid-item-old-file-name">原文件名</div>
-            <div class="rename-preview-content-grid-item-right-arrow">⮕</div>
-            <div class="rename-preview-content-grid-item-new-file-name">新文件名</div>
-            <div class="rename-preview-content-grid-item-new-file-status">
+            </th>
+            <th class="rename-preview-content-table-item-index">
+              <span
+                class="rename-preview-content-table-item-index-reset-sort"
+                title="重置排序"
+                @click="onResetSort"
+              >
+                <component-icon
+                  name="dCaret"
+                  class="rename-preview-content-table-item-index-reset-sort-static"
+                ></component-icon>
+                <component-icon
+                  name="sort"
+                  class="rename-preview-content-table-item-index-reset-sort-hover"
+                ></component-icon>
+              </span>
+              排序
+            </th>
+            <th class="rename-preview-content-table-item-old-file-name">原文件名</th>
+            <th class="rename-preview-content-table-item-right-arrow">⮕</th>
+            <th class="rename-preview-content-table-item-new-file-name">新文件名</th>
+            <th class="rename-preview-content-table-item-new-file-status">
               <component-icon
                 :name="
                   providerRef.hasError
@@ -50,52 +67,68 @@
                         : ''
                 "
               ></component-icon>
-            </div>
-          </li>
-        </ul>
-        <ul class="rename-preview-content-grid-body">
-          <li
+            </th>
+          </tr>
+        </thead>
+        <tbody class="rename-preview-content-table-body">
+          <tr
             v-for="item in currentList"
             :key="item.id"
-            class="rename-preview-content-grid-item"
+            class="rename-preview-content-table-item"
             :class="{
               'is-error': item.isError,
               'is-change': item.isChange,
               'is-checked': item.isChecked,
+              'allow-drop':
+                item.status === 'none' &&
+                (!providerRef.replaceParams.sortChecked || item.isChecked),
+              'block-drop':
+                item.status !== 'none' ||
+                (providerRef.replaceParams.sortChecked && !item.isChecked),
             }"
           >
-            <div class="rename-preview-content-grid-item-checkbox">
+            <td class="rename-preview-content-table-item-checkbox">
               <component-checkbox
                 :model-value="item.isChecked"
                 :readonly="item.status !== 'none'"
                 @update:model-value="onItemIsCheckedUpdate(item, $event)"
               ></component-checkbox>
-            </div>
-            <div class="rename-preview-content-grid-item-old-file-name" :title="item.oldFileName">
-              {{ item.oldFileName }}
-            </div>
-            <div class="rename-preview-content-grid-item-right-arrow">⮕</div>
-            <div class="rename-preview-content-grid-item-new-file-name" :title="item.newFileName">
-              {{ item.newFileName }}
-            </div>
-            <div class="rename-preview-content-grid-item-new-file-status">
+            </td>
+            <td class="rename-preview-content-table-item-index">
               <component-icon
-                :name="
-                  item.status === 'ready'
-                    ? 'timeCircle'
-                    : item.status === 'pending'
-                      ? 'loading'
-                      : item.status === 'success'
-                        ? 'checkCircle'
-                        : item.status === 'fail'
-                          ? 'close'
-                          : ''
-                "
+                name="rank"
+                class="rename-preview-content-table-item-index-handler"
               ></component-icon>
-            </div>
-          </li>
-        </ul>
-      </div>
+              <span class="rename-preview-content-table-item-index-content">
+                {{ item.displayIndex }}
+              </span>
+            </td>
+
+            <td class="rename-preview-content-table-item-old-file-name" :title="item.oldFileName">
+              <component
+                v-if="item.diffList"
+                :is="oldFileNameDiffRender(item.diffList)"
+              ></component>
+              <template v-else>
+                {{ item.oldFileName }}
+              </template>
+            </td>
+            <td class="rename-preview-content-table-item-right-arrow">⮕</td>
+            <td class="rename-preview-content-table-item-new-file-name" :title="item.newFileName">
+              <component
+                v-if="item.diffList"
+                :is="newFileNameDiffRender(item.diffList)"
+              ></component>
+              <template v-else>
+                {{ item.newFileName }}
+              </template>
+            </td>
+            <td class="rename-preview-content-table-item-new-file-status">
+              <component-icon :name="getStatusIcon(item.status)"></component-icon>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
 
     <component-loading v-if="providerRef.isPreviewLoading"></component-loading>
@@ -104,9 +137,16 @@
 
 <script lang="ts">
 import type { Ref } from "vue";
-import type { Provider, IListItem } from "@/provider/interface";
+import type { Change } from "diff";
+import type { Provider, IListItem, TListItemStatus } from "@/provider/interface";
 
-import { ref, inject, onMounted, onUnmounted, defineComponent } from "vue";
+import { h, ref, inject, onMounted, onUnmounted, defineComponent } from "vue";
+import {
+  LIST_ITEM_STATUS_READY,
+  LIST_ITEM_STATUS_PENDING,
+  LIST_ITEM_STATUS_SUCCESS,
+  LIST_ITEM_STATUS_FAIL,
+} from "@/provider/interface";
 import ComponentIcon from "@/components/Component/ComponentIcon.vue";
 import ComponentLoading from "@/components/Component/ComponentLoading.vue";
 import ComponentCheckbox from "@/components/Component/ComponentCheckbox.vue";
@@ -127,12 +167,46 @@ export default defineComponent({
       currentList.value = val;
     };
 
+    const onResetSort = () => {
+      providerRef?.value.resetSort();
+    };
+
     const onCheckedAllUpdate = (val: boolean) => {
       providerRef?.value.updateCheckedAll(val);
     };
 
     const onItemIsCheckedUpdate = (item: IListItem, val: boolean) => {
-      providerRef?.value.updateItemIsCheck(item, val);
+      providerRef?.value.updateItemIsChecked(item, val);
+    };
+
+    const oldFileNameDiffRender = (diffList: Change[]) => {
+      // same: !item.added && !item.removed,
+      return () =>
+        diffList
+          .filter((item) => !item.added)
+          .map((item) => h("span", { class: { removed: item.removed } }, item.value));
+    };
+    const newFileNameDiffRender = (diffList: Change[]) => {
+      return () =>
+        diffList
+          .filter((item) => !item.removed)
+          .map((item) => h("span", { class: { added: item.added } }, item.value));
+    };
+
+    const getStatusIcon = (status: TListItemStatus) => {
+      switch (status) {
+        // LIST_ITEM_STATUS_NONE
+        case LIST_ITEM_STATUS_READY:
+          return "timeCircle";
+        case LIST_ITEM_STATUS_PENDING:
+          return "loading";
+        case LIST_ITEM_STATUS_SUCCESS:
+          return "checkCircle";
+        case LIST_ITEM_STATUS_FAIL:
+          return "close";
+        default:
+          return "";
+      }
     };
 
     onMounted(() => {
@@ -146,8 +220,12 @@ export default defineComponent({
     return {
       providerRef,
       currentList,
+      onResetSort,
       onCheckedAllUpdate,
       onItemIsCheckedUpdate,
+      oldFileNameDiffRender,
+      newFileNameDiffRender,
+      getStatusIcon,
     };
   },
 });
@@ -155,10 +233,11 @@ export default defineComponent({
 
 <style scoped>
 .rename-preview {
+  height: 100%;
   display: grid;
-  grid-gap: var(--cdp-gutter);
   grid-template-rows: auto minmax(200px, 1fr);
 }
+
 .rename-preview-status {
   margin: 0 calc(0px - var(--cdp-gutter) / 2);
   display: flex;
@@ -191,54 +270,122 @@ export default defineComponent({
   color: inherit;
   font-size: var(--cdp-font-size);
 }
-.rename-preview-content-grid {
+
+.rename-preview-content {
+  width: 100%;
   height: 100%;
+  margin: 0 calc(0px - var(--cdp-gutter) / 2);
   overflow: auto;
-  position: relative;
   max-height: 50vh;
 }
-.rename-preview-content-grid-body,
-.rename-preview-content-grid-header {
-  display: grid;
-  grid-gap: var(--cdp-gutter);
+.rename-preview-content-table {
+  width: 100%;
+  height: 100%;
+  position: relative;
   font-size: var(--cdp-font-size-sm);
-  line-height: 1;
-  grid-auto-rows: 1em;
-  grid-template-columns: auto minmax(200px, 1fr) auto minmax(200px, 1fr) 2em;
+  line-height: var(--cdp-font-size-sm);
 }
-.rename-preview-content-grid-header {
+.rename-preview-content-table-header {
   top: 0;
   z-index: 1;
   position: sticky;
   margin-bottom: var(--cdp-gutter);
   background-color: var(--cdp-color-white);
 }
-.rename-preview-content-grid-item {
-  color: var(--cdp-color-gray-300);
-  display: contents;
-  transition: color var(--cdp-transition-default);
+.rename-preview-content-table-header th {
+  padding: var(--cdp-gutter) calc(var(--cdp-gutter) / 2);
+  text-align: left;
+  box-sizing: border-box;
 }
-.rename-preview-content-grid-item.is-checked {
+.rename-preview-content-table-body td {
+  padding: calc(var(--cdp-gutter) / 4) calc(var(--cdp-gutter) / 2);
+  box-sizing: border-box;
+}
+.rename-preview-content-table-item {
+  color: var(--cdp-color-gray-300);
+  transition: color var(--cdp-transition-default);
+  background-color: var(--cdp-color-white);
+}
+.rename-preview-content-table-item.is-checked {
   color: var(--cdp-color-gray-600);
 }
-.rename-preview-content-grid-item.is-checked.is-change {
+.rename-preview-content-table-item.is-checked.is-change {
   color: var(--cdp-color-gray-900);
 }
-.rename-preview-content-grid-item.is-checked.is-error {
+.rename-preview-content-table-item.is-checked.is-error {
   color: var(--cdp-color-red);
 }
-.rename-preview-content-grid-item-old-file-name,
-.rename-preview-content-grid-item-new-file-name,
-.rename-preview-content-grid-item-new-file-status {
+.rename-preview-content-table-item-placeholder {
+  background-color: var(--cdp-color-blue-400);
+}
+.rename-preview-content-table-item-dragged {
+  display: flex;
+}
+.rename-preview-content-table-item-checkbox {
+  width: calc(var(--cdp-gutter) + 1em);
+}
+.rename-preview-content-table-item-index {
+  width: 5rem;
+  -webkit-user-select: none; /* Safari */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* IE 10+ */
+  user-select: none; /* 标准语法 */
+}
+.rename-preview-content-table-item-index-reset-sort {
+  cursor: pointer;
+}
+.rename-preview-content-table-item-index-reset-sort:hover
+  .rename-preview-content-table-item-index-reset-sort-static {
+  display: none;
+}
+.rename-preview-content-table-item-index-reset-sort-hover {
+  display: none;
+}
+.rename-preview-content-table-item-index-reset-sort:hover
+  .rename-preview-content-table-item-index-reset-sort-hover {
+  display: inline-block;
+}
+.rename-preview-content-table-item.allow-drop .rename-preview-content-table-item-index-handler {
+  cursor: grab;
+}
+.rename-preview-content-table-item.block-drop .rename-preview-content-table-item-index-handler {
+  /* cursor: no-drop; */
+  display: none;
+}
+.rename-preview-content-table-item-index-content {
+  display: inline-block;
+}
+.rename-preview-content-table-item-old-file-name,
+.rename-preview-content-table-item-new-file-name,
+.rename-preview-content-table-item-new-file-status {
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
 }
-.rename-preview-content-grid-item-new-file-status {
-  display: flex;
+.rename-preview-content-table-item.is-checked
+  .rename-preview-content-table-item-old-file-name:deep(.removed) {
+  color: var(--cdp-color-red);
+}
+.rename-preview-content-table-item-old-file-name:deep(.removed) {
+  background-color: var(--cdp-color-red-100);
+}
+.rename-preview-content-table-item.is-checked
+  .rename-preview-content-table-item-new-file-name:deep(.added) {
+  color: var(--cdp-color-green);
+}
+.rename-preview-content-table-item-new-file-name:deep(.added) {
+  background-color: var(--cdp-color-green-100);
+}
+
+.rename-preview-content-table-item-right-arrow {
+  width: calc(var(--cdp-gutter) + 1em);
+  -webkit-user-select: none; /* Safari */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* IE 10+ */
+  user-select: none; /* 标准语法 */
+}
+.rename-preview-content-table-item-new-file-status {
+  width: calc(var(--cdp-gutter) + 1em);
   text-align: right;
-  align-items: center;
-  padding-right: calc(var(--cdp-gutter) / 2);
-  justify-content: flex-end;
 }
 </style>

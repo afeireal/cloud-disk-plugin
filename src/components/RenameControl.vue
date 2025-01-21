@@ -1,7 +1,7 @@
 <template>
   <div v-if="providerRef" class="rename-control">
     <div class="rename-control-header">
-      <span class="rename-control-header-content"> 批量重命名当前目录下所有文件 </span>
+      <span class="rename-control-header-content">批量重命名当前目录下所有文件</span>
       <template v-if="versionVisible">
         <a
           v-if="hasNewVersion"
@@ -75,6 +75,9 @@
         </component-radio>
         <component-checkbox v-model="providerRef.replaceParams.autoEpisode" :disabled="isDisabled">
           自动集数
+        </component-checkbox>
+        <component-checkbox v-model="providerRef.replaceParams.sortChecked" :disabled="isDisabled">
+          排序已选
         </component-checkbox>
       </div>
       <button
