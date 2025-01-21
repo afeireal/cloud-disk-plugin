@@ -4,6 +4,7 @@ import EnterComponent from "./EnterComponent.vue";
 import Provider from "@/provider/interface";
 import fileNameParse from "@/utils/fileNameParse";
 import { ROOT_ELEMENT_INSERT_METHOD_PREPEND } from "@/provider/interface";
+import sleep from "@/utils/sleep";
 import { findReactFiberNode, getRootReactContainer } from "@/utils/reactFiber";
 
 export default class ProviderQuark extends Provider {
@@ -32,9 +33,30 @@ export default class ProviderQuark extends Provider {
       return Promise.reject();
     }
 
-    const state = reactFiberNode.pendingProps.store.getState();
+    let state = reactFiberNode.pendingProps.store.getState();
 
-    const originList = state.file?.[state.file.listType]?.list;
+    const hasMore =
+      state.file[state.file.listType].list.length !== state.file[state.file.listType].total;
+    if (hasMore) {
+      await reactFiberNode.pendingProps.store.dispatch.file.loadAllFiles({
+        params: {
+          needTotalNum: 1,
+          page: 1,
+          size: state.file[state.file.listType].total,
+          sort: state.file[state.file.listType].sort,
+        },
+        fid: state.file[state.file.listType].list[0].pdir_fid,
+        listType: state.file.listType,
+      });
+
+      do {
+        await sleep(300);
+        state = reactFiberNode.pendingProps.store.getState();
+      } while (
+        state.file[state.file.listType].list.length !== state.file[state.file.listType].total
+      );
+    }
+    const originList = state.file[state.file.listType].list;
     if (!originList) {
       return Promise.reject();
     }
