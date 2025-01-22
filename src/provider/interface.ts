@@ -107,7 +107,6 @@ export abstract class Provider {
   }
   // 更新当前文件列表数据
   private _updateCurrentList(): IListItem[] {
-    console.log("_updateCurrentList");
     const renameMode = this.replaceParams.renameMode;
 
     let result: IListItem[] = this.originList.map((item) => {
