@@ -1,11 +1,17 @@
 import type { IListItem, IOriginListItem } from "@/provider/interface";
 
+import {
+  Provider,
+  LIST_ITEM_STATUS_READY,
+  LIST_ITEM_STATUS_PENDING,
+  LIST_ITEM_STATUS_SUCCESS,
+  LIST_ITEM_STATUS_FAIL,
+  ROOT_ELEMENT_INSERT_METHOD_APPEND,
+} from "@/provider/interface";
 import EnterComponent from "./EnterComponent.vue";
-import Provider from "@/provider/interface";
 import sleep from "@/utils/sleep";
 import querySelector from "@/utils/querySelector";
 import fileNameParse from "@/utils/fileNameParse";
-import { ROOT_ELEMENT_INSERT_METHOD_APPEND } from "@/provider/interface";
 
 export default class ProviderBaidu extends Provider {
   static test = () =>
@@ -36,12 +42,13 @@ export default class ProviderBaidu extends Provider {
     }
 
     const result: IOriginListItem[] = [];
-
+    let index = 0;
     originList.forEach((item: any) => {
       if (item.isdir === 0) {
         result.push({
           id: item.fs_id,
           path: item.path,
+          index: index++,
           fullFileName: item.formatName,
           ...fileNameParse(item.formatName),
         });
@@ -63,7 +70,7 @@ export default class ProviderBaidu extends Provider {
       if (!tasks[key]) {
         tasks[key] = [];
       }
-      item.status = "ready";
+      item.status = LIST_ITEM_STATUS_READY;
       tasks[key].push(item);
     });
 
@@ -82,7 +89,7 @@ export default class ProviderBaidu extends Provider {
   async renameTask(data: IListItem[], token: string) {
     const body = new FormData();
     const filelist = data.map((item) => {
-      item.status = "pending";
+      item.status = LIST_ITEM_STATUS_PENDING;
       return {
         id: item.id,
         path: item.path,
@@ -104,7 +111,7 @@ export default class ProviderBaidu extends Provider {
           return res.json();
         } else {
           data.forEach((item) => {
-            item.status = "fail";
+            item.status = LIST_ITEM_STATUS_FAIL;
           });
           return Promise.reject(res);
         }
@@ -112,7 +119,7 @@ export default class ProviderBaidu extends Provider {
       .then(async (res: any) => {
         if (res.errno !== 0) {
           data.forEach((item) => {
-            item.status = "fail";
+            item.status = LIST_ITEM_STATUS_FAIL;
           });
           return Promise.reject(res);
         }
@@ -120,7 +127,7 @@ export default class ProviderBaidu extends Provider {
         const result = res.taskid ? await this.waitPollTaskResult(res) : res;
 
         data.forEach((item) => {
-          item.status = "success";
+          item.status = LIST_ITEM_STATUS_SUCCESS;
         });
         return result;
       });
@@ -169,7 +176,7 @@ export default class ProviderBaidu extends Provider {
     //       originListMap.has(item.id) &&
     //       originListMap.get(item.id) === item.newFileName
     //     ) {
-    //       item.status = "success";
+    //       item.status = LIST_ITEM_STATUS_SUCCESS;
     //     } else {
     //       isMatched = false;
     //     }

@@ -1,9 +1,16 @@
 import type { IListItem, IOriginListItem } from "@/provider/interface";
 
+import {
+  Provider,
+  LIST_ITEM_STATUS_READY,
+  LIST_ITEM_STATUS_PENDING,
+  LIST_ITEM_STATUS_SUCCESS,
+  LIST_ITEM_STATUS_FAIL,
+} from "@/provider/interface";
 import EnterComponent from "./EnterComponent.vue";
-import Provider from "@/provider/interface";
 import fileNameParse from "@/utils/fileNameParse";
 import { ROOT_ELEMENT_INSERT_METHOD_PREPEND } from "@/provider/interface";
+import sleep from "@/utils/sleep";
 import { findReactFiberNode, getRootReactContainer } from "@/utils/reactFiber";
 
 export default class ProviderQuark extends Provider {
@@ -32,18 +39,41 @@ export default class ProviderQuark extends Provider {
       return Promise.reject();
     }
 
-    const state = reactFiberNode.pendingProps.store.getState();
+    let state = reactFiberNode.pendingProps.store.getState();
 
-    const originList = state.file?.[state.file.listType]?.list;
+    const hasMore =
+      state.file[state.file.listType].list.length !== state.file[state.file.listType].total;
+    if (hasMore) {
+      await reactFiberNode.pendingProps.store.dispatch.file.loadAllFiles({
+        params: {
+          needTotalNum: 1,
+          page: 1,
+          size: state.file[state.file.listType].total,
+          sort: state.file[state.file.listType].sort,
+        },
+        fid: state.file[state.file.listType].list[0].pdir_fid,
+        listType: state.file.listType,
+      });
+
+      do {
+        await sleep(300);
+        state = reactFiberNode.pendingProps.store.getState();
+      } while (
+        state.file[state.file.listType].list.length !== state.file[state.file.listType].total
+      );
+    }
+    const originList = state.file[state.file.listType].list;
     if (!originList) {
       return Promise.reject();
     }
 
     const result: IOriginListItem[] = [];
+    let index = 0;
     originList.forEach((item: any) => {
       if (item.file) {
         result.push({
           id: item.fid,
+          index: index++,
           fullFileName: item.file_name,
           ...fileNameParse(item.file_name),
         });
@@ -68,14 +98,14 @@ export default class ProviderQuark extends Provider {
     const taskList: IListItem[] = [];
 
     data.forEach((item) => {
-      item.status = "ready";
+      item.status = LIST_ITEM_STATUS_READY;
       taskList.push(item);
     });
 
     while (taskList.length) {
       const item = taskList.shift() as IListItem;
 
-      item.status = "pending";
+      item.status = LIST_ITEM_STATUS_PENDING;
       this._updateStatus();
       try {
         const res = await reactFiberNode.pendingProps.rename({
@@ -83,12 +113,12 @@ export default class ProviderQuark extends Provider {
           fileName: item.newFileName,
         });
         if (res.status === 200 && res.code === 0) {
-          item.status = "success";
+          item.status = LIST_ITEM_STATUS_SUCCESS;
         } else {
-          item.status = "fail";
+          item.status = LIST_ITEM_STATUS_FAIL;
         }
       } catch (error) {
-        item.status = "fail";
+        item.status = LIST_ITEM_STATUS_FAIL;
       }
       this._updateStatus();
     }

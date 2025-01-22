@@ -4,6 +4,8 @@
 
 批量重命名当前支持两种方式：剧集模式和正则模式
 
+可对文件进行排序，应用到自动集数的重命名中
+
 ## 适用范围
 
 - ✅ 百度网盘
@@ -79,3 +81,11 @@ PikPak云盘入口
 - 点击应用时，只会重命名已选中的文件
 
 <img src="https://cdn.jsdelivr.net/gh/afeireal/cloud-disk-plugin/image/readme/screenshot_main_panel_series_check.png" alt="替换范围" width="500" />
+
+### 排序已选
+
+- 可以手动调整排序
+- 勾选`排序已选`可只对已选中的文件进行排序
+
+<img src="https://cdn.jsdelivr.net/gh/afeireal/cloud-disk-plugin/image/readme/screenshot_main_panel_sort_checked_example_1" alt="排序已选" width="500" />
+<img src="https://cdn.jsdelivr.net/gh/afeireal/cloud-disk-plugin/image/readme/screenshot_main_panel_sort_checked_example_2" alt="排序已选" width="500" />

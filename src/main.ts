@@ -59,4 +59,3 @@ const main = async () => {
 };
 
 main();
-// document.querySelector("#app")._vnode.component.subTree.component.subTree.children[0].children[0].component.subTree.component.subTree.children[0].children[1].children[1].component.subTree.children[0].component.subTree.component.subTree.children[0].children[1].ctx.subTree.children[0].children[1].children[1].component.subTree.children[0].children[0].children[0].children[0].children[0].children[0].children

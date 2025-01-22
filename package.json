@@ -4,7 +4,7 @@
   "cnName": "网盘文件批量重命名",
   "author": "afeireal",
   "license": "MIT",
-  "version": "1.2.1",
+  "version": "1.3.0",
   "keywords": [
     "网盘",
     "重命名",
@@ -30,13 +30,17 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
+    "diff": "^7.0.0",
+    "sortablejs": "^1.15.3",
     "vue": "^3.4.38",
     "webextension-polyfill": "^0.12.0"
   },
   "devDependencies": {
     "@rushstack/eslint-patch": "^1.10.4",
     "@types/chrome": "^0.0.270",
+    "@types/diff": "^6.0.0",
     "@types/node": "^20.16.2",
+    "@types/sortablejs": "^1.15.8",
     "@types/webextension-polyfill": "^0.12.1",
     "@vitejs/plugin-vue": "^5.1.2",
     "@vue/eslint-config-prettier": "^9.0.0",
