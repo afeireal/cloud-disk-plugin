@@ -1,7 +1,13 @@
 import type { IListItem, IOriginListItem } from "@/provider/interface";
 
+import {
+  Provider,
+  LIST_ITEM_STATUS_READY,
+  LIST_ITEM_STATUS_PENDING,
+  LIST_ITEM_STATUS_SUCCESS,
+  LIST_ITEM_STATUS_FAIL,
+} from "@/provider/interface";
 import EnterComponent from "./EnterComponent.vue";
-import Provider from "@/provider/interface";
 import querySelector from "@/utils/querySelector";
 import fileNameParse from "@/utils/fileNameParse";
 import { ROOT_ELEMENT_INSERT_METHOD_APPEND } from "@/provider/interface";
@@ -47,10 +53,12 @@ export default class ProviderAli extends Provider {
     }
 
     const result: IOriginListItem[] = [];
+    let index = 0;
     originList.forEach((item: any) => {
       if (item.type === "file") {
         result.push({
           id: item.fileId,
+          index: index++,
           fullFileName: item.name,
           ...fileNameParse(item.name),
         });
@@ -81,10 +89,10 @@ export default class ProviderAli extends Provider {
     data.forEach((item) => {
       const originItem: any = originListMap.get(item.id);
       if (originItem) {
-        item.status = "ready";
+        item.status = LIST_ITEM_STATUS_READY;
         return taskList.push({ item, originItem });
       } else {
-        item.status = "fail";
+        item.status = LIST_ITEM_STATUS_FAIL;
       }
     });
 
@@ -94,17 +102,17 @@ export default class ProviderAli extends Provider {
         originItem: any;
       };
 
-      item.status = "pending";
+      item.status = LIST_ITEM_STATUS_PENDING;
       this._updateStatus();
       try {
         await originItem.rename(item.newFileName);
         if (originItem.name === item.newFileName) {
-          item.status = "success";
+          item.status = LIST_ITEM_STATUS_SUCCESS;
         } else {
-          item.status = "fail";
+          item.status = LIST_ITEM_STATUS_FAIL;
         }
       } catch (error) {
-        item.status = "fail";
+        item.status = LIST_ITEM_STATUS_FAIL;
       }
       this._updateStatus();
     }

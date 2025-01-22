@@ -1,10 +1,15 @@
-import type { IListItem } from "@/provider/interface";
+import type { IListItem, IOriginListItem } from "@/provider/interface";
 
+import {
+  Provider,
+  LIST_ITEM_STATUS_READY,
+  LIST_ITEM_STATUS_SUCCESS,
+  LIST_ITEM_STATUS_FAIL,
+  ROOT_ELEMENT_INSERT_METHOD_APPEND,
+} from "@/provider/interface";
 import EnterComponent from "./EnterComponent.vue";
-import Provider from "@/provider/interface";
 import fileNameParse from "@/utils/fileNameParse";
 import querySelector from "@/utils/querySelector";
-import { ROOT_ELEMENT_INSERT_METHOD_APPEND } from "@/provider/interface";
 
 interface renameFetchHeaders {
   Authorization?: string;
@@ -25,23 +30,31 @@ export default class ProviderQuark extends Provider {
 
   async getOriginList() {
     const vue = this._getVue();
-    if (vue?.config?.globalProperties?.$pinia?.state?.value?.file?.dbFiles) {
-      return vue.config.globalProperties.$pinia.state.value.file.dbFiles
-        .filter((item: any) => item.kind === "drive#file")
-        .map((item: any) => {
-          return {
-            id: item.id,
-            fullFileName: item.name,
-            ...fileNameParse(item.name),
-          };
-        });
+
+    const originList = vue?.config?.globalProperties?.$pinia?.state?.value?.file?.dbFiles;
+
+    if (!originList) {
+      return Promise.reject();
     }
-    return [];
+
+    const result: IOriginListItem[] = [];
+    let index = 0;
+    originList.forEach((item: any) => {
+      if (item.kind === "drive#file") {
+        result.push({
+          id: item.id,
+          index: index++,
+          fullFileName: item.name,
+          ...fileNameParse(item.name),
+        });
+      }
+    });
+    return result;
   }
 
   async renameRequest(data: IListItem[]) {
     const tasks = data.map((item) => {
-      item.status = "ready";
+      item.status = LIST_ITEM_STATUS_READY;
       return item;
     });
     const captchaKey = Object.keys(localStorage).find((item) => item.startsWith("captcha_"));
@@ -96,10 +109,10 @@ export default class ProviderQuark extends Provider {
         if (res.error_code || res.error_description) {
           return Promise.reject(res);
         }
-        data.status = "success";
+        data.status = LIST_ITEM_STATUS_SUCCESS;
       })
       .catch(() => {
-        data.status = "fail";
+        data.status = LIST_ITEM_STATUS_FAIL;
       })
       .finally(() => {
         this._updateStatus();
