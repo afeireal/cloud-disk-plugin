@@ -52,9 +52,11 @@ function _getRootReactContainer(
   if (!rootElement) {
     return isPromise ? Promise.reject() : undefined;
   }
-  const keys = Object.keys(rootElement) as Array<keyof Element>;
+  const keys = Object.keys(rootElement) as Array<keyof HTMLElement>;
 
-  const reactContainerKey = keys.find((item: keyof Element) => item.startsWith("__reactContainer"));
+  const reactContainerKey = keys.find((item: keyof HTMLElement) =>
+    item.startsWith("__reactContainer")
+  );
 
   if (!reactContainerKey) {
     return isPromise ? Promise.reject() : undefined;

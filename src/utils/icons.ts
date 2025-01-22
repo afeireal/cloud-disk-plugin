@@ -446,6 +446,86 @@ const smileFilled: TIcon = {
   },
 };
 
+const copyDocument: TIcon = {
+  type: "svg",
+  props: {
+    fill: "currentColor",
+    xmlns: "http://www.w3.org/2000/svg",
+    width: "1em",
+    height: "1em",
+    version: "1.1",
+    viewBox: "0 0 1024 1024",
+  },
+  children: [
+    {
+      type: "path",
+      props: {
+        d: "M768 832a128 128 0 0 1-128 128H192A128 128 0 0 1 64 832V384a128 128 0 0 1 128-128v64a64 64 0 0 0-64 64v448a64 64 0 0 0 64 64h448a64 64 0 0 0 64-64z",
+      },
+    },
+    {
+      type: "path",
+      props: {
+        d: "M384 128a64 64 0 0 0-64 64v448a64 64 0 0 0 64 64h448a64 64 0 0 0 64-64V192a64 64 0 0 0-64-64zm0-64h448a128 128 0 0 1 128 128v448a128 128 0 0 1-128 128H384a128 128 0 0 1-128-128V192A128 128 0 0 1 384 64",
+      },
+    },
+  ],
+};
+
+const rank: TIcon = {
+  type: "svg",
+  props: {
+    fill: "currentColor",
+    xmlns: "http://www.w3.org/2000/svg",
+    width: "1em",
+    height: "1em",
+    version: "1.1",
+    viewBox: "0 0 1024 1024",
+  },
+  children: {
+    type: "path",
+    props: {
+      d: "m186.496 544 41.408 41.344a32 32 0 1 1-45.248 45.312l-96-96a32 32 0 0 1 0-45.312l96-96a32 32 0 1 1 45.248 45.312L186.496 480h290.816V186.432l-41.472 41.472a32 32 0 1 1-45.248-45.184l96-96.128a32 32 0 0 1 45.312 0l96 96.064a32 32 0 0 1-45.248 45.184l-41.344-41.28V480H832l-41.344-41.344a32 32 0 0 1 45.248-45.312l96 96a32 32 0 0 1 0 45.312l-96 96a32 32 0 0 1-45.248-45.312L832 544H541.312v293.44l41.344-41.28a32 32 0 1 1 45.248 45.248l-96 96a32 32 0 0 1-45.312 0l-96-96a32 32 0 1 1 45.312-45.248l41.408 41.408V544H186.496z",
+    },
+  },
+};
+
+const sort: TIcon = {
+  type: "svg",
+  props: {
+    fill: "currentColor",
+    xmlns: "http://www.w3.org/2000/svg",
+    width: "1em",
+    height: "1em",
+    version: "1.1",
+    viewBox: "0 0 1024 1024",
+  },
+  children: {
+    type: "path",
+    props: {
+      d: "M384 96a32 32 0 0 1 64 0v786.752a32 32 0 0 1-54.592 22.656L95.936 608a32 32 0 0 1 0-45.312h.128a32 32 0 0 1 45.184 0L384 805.632zm192 45.248a32 32 0 0 1 54.592-22.592L928.064 416a32 32 0 0 1 0 45.312h-.128a32 32 0 0 1-45.184 0L640 218.496V928a32 32 0 1 1-64 0V141.248z",
+    },
+  },
+};
+
+const dCaret: TIcon = {
+  type: "svg",
+  props: {
+    fill: "currentColor",
+    xmlns: "http://www.w3.org/2000/svg",
+    width: "1em",
+    height: "1em",
+    version: "1.1",
+    viewBox: "0 0 1024 1024",
+  },
+  children: {
+    type: "path",
+    props: {
+      d: "m512 128 288 320H224zM224 576h576L512 896z",
+    },
+  },
+};
+
 const loading: TIcon = {
   type: "svg",
   props: {
@@ -571,6 +651,11 @@ const icons: { [key: string]: TIcon } = {
   mehFilled,
   smile,
   smileFilled,
+
+  copyDocument,
+  rank,
+  sort,
+  dCaret,
 
   loading,
 };
