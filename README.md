@@ -87,5 +87,5 @@ PikPak云盘入口
 - 可以手动调整排序
 - 勾选`排序已选`可只对已选中的文件进行排序
 
-<img src="https://cdn.jsdelivr.net/gh/afeireal/cloud-disk-plugin/image/readme/screenshot_main_panel_sort_checked_example_1" alt="排序已选" width="500" />
-<img src="https://cdn.jsdelivr.net/gh/afeireal/cloud-disk-plugin/image/readme/screenshot_main_panel_sort_checked_example_2" alt="排序已选" width="500" />
+<img src="https://cdn.jsdelivr.net/gh/afeireal/cloud-disk-plugin/image/readme/screenshot_main_panel_sort_checked_example_1.png" alt="排序已选" width="500" />
+<img src="https://cdn.jsdelivr.net/gh/afeireal/cloud-disk-plugin/image/readme/screenshot_main_panel_sort_checked_example_2.png" alt="排序已选" width="500" />
